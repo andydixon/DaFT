@@ -5,16 +5,17 @@
 ---
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Installation](#installation)
 3. [Configuration](#configuration)
 4. [Usage](#usage)
-    - [JSON / telegraf Format](#json--telegraf-format)
-    - [Prometheus Format](#prometheus-format)
+   - [JSON / telegraf Format](#json--telegraf-format)
+   - [Prometheus Format](#prometheus-format)
 5. [Prometheus Exporter Notes](#prometheus-exporter-notes)
 6. [Web Server Configuration](#web-server-configuration)
-    - [Nginx](#nginx)
-    - [Apache](#apache)
+   - [Nginx](#nginx)
+   - [Apache](#apache)
 7. [Configuring Prometheus](#configuring-prometheus)
 8. [Configuring telegraf](#configuring-telegraf)
 9. [Troubleshooting](#troubleshooting)
@@ -27,10 +28,11 @@
 Federaliser ensures all your data outputs are provided in a consistent format—so that no matter what your data source is, you can easily integrate it with your existing monitoring and metrics systems.
 
 Supported data source types:
+
 - **MySQL** (`type = mysql`)
 - **MSSQL** (`type = mssql`)
 - **Redshift** (`type = redshift`)
-    - Postgres can also work under the `redshift` type
+  - Postgres can also work under the `redshift` type
 - **Prometheus** (`type = prometheus`)
 
 ---
@@ -65,13 +67,13 @@ Supported data source types:
    ```
 
 3. **Explanation of keys**:
-    - **hostname**: The database/endpoint host.
-    - **port**: Connection port.
-    - **type**: One of `mysql`, `mssql`, `redshift`, or `prometheus`.
-    - **identifier**: A unique identifier that appears in the URL (e.g., `http://HOSTNAME/federaliser/identifier`).
-    - **username**, **password**: Credentials for connecting to your data source.
-    - **default_db**: The default database to connect to (for SQL databases).
-    - **query**: The SQL query to run (if applicable).
+   - **hostname**: The database/endpoint host.
+   - **port**: Connection port.
+   - **type**: One of `mysql`, `mssql`, `redshift`, or `prometheus`.
+   - **identifier**: A unique identifier that appears in the URL (e.g., `http://HOSTNAME/federaliser/identifier`).
+   - **username**, **password**: Credentials for connecting to your data source.
+   - **default_db**: The default database to connect to (for SQL databases).
+   - **query**: The SQL query to run (if applicable).
 
 ---
 
@@ -80,9 +82,11 @@ Supported data source types:
 Once installed and configured:
 
 1. **Access the tool** in your browser via:
+
    ```
    http://<YOUR_HOST>/<identifier>
    ```
+
    Replace `<identifier>` with the identifier you set in `config.ini`.
 
 2. Federaliser will run the query or gather data and return JSON by default (suitable for telegraf or general parsing).
@@ -90,34 +94,30 @@ Once installed and configured:
 ### JSON / telegraf Format
 
 When accessed via:
+
 ```
 http://<YOUR_HOST>/<identifier>
 ```
+
 the data is presented as a JSON object. This is suitable for pushing to telegraf or consuming by any other JSON-based pipeline.
 
 ### Prometheus Format
 
 When accessed via:
+
 ```
 http://<YOUR_HOST>/<identifier>/prometheus
 ```
+
 the data is presented in a Prometheus-compatible text format.
 
 ---
 
 ## Prometheus Exporter Notes
 
-Federaliser supports special column name prefixes to help define metric types in Prometheus. If a column name is prefixed with any of the following, Federaliser strips the prefix for the Prometheus output and assigns the corresponding type:
+Federaliser supports special column name prefixes to help define metric types in Prometheus. If a column name is prefixed with four underscores, then the underscores are removed, and the key and value are stored as a label. By default, any other fields will have a label of 'column' with the value of the label being the column name.
 
-- `__c_` : **counter**
-- `__h_` : **histogram**
-- `__g_` : **gauge**
-- `__s_` : **summary**
-- `__u_` : **untyped**
-
-> **Note**: These prefixes are **not** removed for the JSON/telegraf exporter. They will appear as-is.
-
-If these prefixes are not present, Federaliser will still expose the data for Prometheus, using default assumptions.
+> **Note**: The prefix is **not** removed for the JSON/telegraf exporter. They will appear as-is.
 
 ---
 
@@ -138,6 +138,7 @@ location / {
 ### Apache
 
 A sample `.htaccess` file is included in the `public` folder:
+
 ```
 <IfModule mod_rewrite.c>
     RewriteEngine On
@@ -171,7 +172,6 @@ Then reload prometheus - for example:
 systemctl reload prometheus
 ```
 
-
 ## Configuring telegraf
 
 In `/etc/telegraf/telegraf.d`, create a file, eg `federaliser.conf` and add the following content:
@@ -195,7 +195,6 @@ In `/etc/telegraf/telegraf.d`, create a file, eg `federaliser.conf` and add the 
 ```
 
 Then, reload telegraf - eg `systemctl reload telegraf`
-
 
 ## Troubleshooting
 
