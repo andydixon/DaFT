@@ -1,0 +1,12 @@
+{
+  "name": "andydixon/federaliser",
+  "description": "A minimal PSR-4 example for a Federaliser application.",
+  "autoload": {
+    "psr-4": {
+      "Federaliser\\": "src/Federaliser/"
+    }
+  },
+  "require": {
+    "php": ">=8.0"
+  }
+}
