@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h1>Create New Config Section</h1>
+    <h1>Federliser::Create</h1>
 
     <?php if (!empty($error)): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
@@ -32,10 +32,10 @@
             <label for="type">Type</label>
             <select class="form-control" id="type" name="type" required>
                 <option value="">-- Choose type --</option>
-                <option value="mysql">mysql</option>
-                <option value="mssql">mssql</option>
-                <option value="redshift">redshift</option>
-                <option value="prometheus">prometheus</option>
+                <option value="mysql">MySQL or MySQL compatible</option>
+                <option value="mssql">Microsoft SQL Server</option>
+                <option value="redshift">RedShift / Postgres</option>
+                <option value="prometheus">Prometheus</option>
             </select>
         </div>
         <div class="form-group">

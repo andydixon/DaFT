@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h1>Edit Config Section</h1>
+    <h1>Federaliser::Edit</h1>
 
     <?php if (!empty($error)): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
@@ -37,11 +37,11 @@
             <label for="type">Type</label>
             <select class="form-control" id="type" name="type" required>
                 <?php
-                    $types = ['mysql', 'mssql', 'redshift', 'prometheus'];
+                    $types = ['mysql'=>'MySQL or MySQL compatible', 'mssql'=>'Microsoft SQL Server', 'redshift'=>'RedShift / Postgres', 'prometheus'=>'Prometheus'];
                     $currentType = $sectionData['type'] ?? '';
-                    foreach ($types as $t) {
+                    foreach ($types as $t=>$label) {
                         $selected = ($currentType === $t) ? 'selected' : '';
-                        echo "<option value='{$t}' {$selected}>{$t}</option>";
+                        echo "<option value='{$t}' {$selected}>{$label}</option>";
                     }
                 ?>
             </select>

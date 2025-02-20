@@ -161,8 +161,7 @@ class ConfigModel
      */
     private function write(): void
     {
-        $content = "; config.ini\n";
-        $content .= "; The 'identifier' in each section is important to route queries to the correct DB.\n\n";
+        $content = "";
 
         foreach ($this->configData as $section => $values) {
             $content .= "[{$section}]\n";

@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h1>All Config Sections</h1>
+    <h1>Federaliser Administration</h1>
     <a href="?action=create" class="btn btn-primary mb-3">Add New Section</a>
 
     <table class="table table-bordered table-striped">
