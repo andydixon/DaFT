@@ -6,6 +6,7 @@
  */
 
 namespace Federaliser;
+use Federaliser\Dataformats\HandlerFactory;
 
 class Application
 {
@@ -21,6 +22,7 @@ class Application
         // Parse configuration
         $configParser = new ConfigParser($this->configFile);
         $this->configData = $configParser->getConfig();
+
 
         // Create our simple router
         $this->router = new Router();
@@ -44,9 +46,16 @@ class Application
 
             // Register route
             $this->router->add($identifier, function () use ($identifier, $params,$isPrometheus) {
-                // Connect to the DB/endpoint
-                $connectionFactory = new ConnectionFactory($params);
-                $result = $connectionFactory->runQuery();
+
+            $handler = HandlerFactory::create($params);
+
+            // Process the data.
+            try {
+            $result = $handler->handle();
+            } catch (\Exception $e) {
+            $result['error']=['message'=>$e->getMessage()];
+            }
+
 
                 if (!empty($result['error'])) {
                     header("HTTP/1.1 500 Something buggered up");

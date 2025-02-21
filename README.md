@@ -27,13 +27,38 @@
 
 Federaliser ensures all your data outputs are provided in a consistent format—so that no matter what your data source is, you can easily integrate it with your existing monitoring and metrics systems.
 
-Supported data source types:
+# Federaliser Data Formats
+
+Federaliser ensures all your data outputs are provided in a consistent format—so that no matter what your data source or output style is, you can easily integrate it with your existing monitoring and metrics systems.
+
+## Supported Data Source Types
 
 - **MySQL** (`type = mysql`)
 - **MSSQL** (`type = mssql`)
 - **Redshift** (`type = redshift`)
-  - Postgres can also work under the `redshift` type
+  - _Note:_ PostgreSQL can also work under the `redshift` type.
 - **Prometheus** (`type = prometheus`)
+
+## Supported Data Format Handlers
+
+In addition to traditional database queries, Federaliser now provides a flexible data formatting layer for non-database sources. These handlers are implemented in the `Federaliser\Dataformats` namespace and normalize data from various outputs into a consistent array format (which you can then encode as JSON):
+
+- **Web JSON** (`type = web-json`)  
+  Fetches JSON data from a URL specified in the `hostname` field. If a `query` (a comma-separated list of keys) is provided, only those keys are extracted from the returned data.
+
+- **App JSON** (`type = app-json`)  
+  Executes a command-line application (specified by `hostname`) that returns JSON. The output is decoded, normalized, and optionally filtered based on provided keys.
+
+- **Standard Output** (`type = stdout`)  
+  Runs an external application and captures its STDOUT. When a `query` is set (as a regex pattern with named capturing groups), the output is parsed into a structured multidimensional array.
+
+- **Web XML** (`type = web-xml`)  
+  Retrieves XML data from a URL, converts it to an associative array, and filters the data based on specified query keys if needed.
+
+- **App XML** (`type = app-xml`)  
+  Executes an external application that outputs XML, converts the XML to an array, and applies filtering based on query keys.
+
+This modular approach allows you to work seamlessly with a variety of data sources and formats—all under a unified, consistent API.
 
 ---
 
@@ -74,6 +99,106 @@ Supported data source types:
    - **username**, **password**: Credentials for connecting to your data source.
    - **default_db**: The default database to connect to (for SQL databases).
    - **query**: The SQL query to run (if applicable).
+
+---
+
+## Example Configurations
+
+Below are sample `config.ini` snippets for each supported data source and data format handler.
+
+### MySQL or MySQL Compatible
+
+```ini
+[descriptive]
+hostname    = mysql.example.com
+port      = 3306
+type     = mysql
+default_db  = mydatabase
+username   = dbuser
+password     = secret
+query      = SELECT * FROM users
+```
+
+### Microsoft SQL Server
+
+```ini
+[descriptive]
+hostname   = mssql.example.com
+port      = 1433
+type     = mssql
+default_db  = mydatabase
+username   = dbuser
+password     = secret
+query    = SELECT* FROM customers
+```
+
+### RedShift
+
+```ini
+[descriptive]
+hostname    = redshift-cluster-1.xyz.eu-west-2.redshift.amazonaws.com
+port      = 5439
+type     = redshift
+default_db   = analytics
+username    = awsuser
+password   = awspassword
+query     = SELECT * FROM sales LIMIT 5
+```
+
+### Prometheus
+
+```ini
+[descriptive]
+hostname  = http://prometheus.xample.com
+port      = 9090
+type     = prometheus
+query       = up
+```
+
+### Web JSON
+
+```ini
+[descriptive]
+hostname    = https://api.example.com/data.json
+type     = web-json
+query      = id,name,status
+```
+
+### App JSON
+
+```ini
+[descriptive]
+hostname    = /usr/local/bin/my-json-app --option=value
+type      = app-json
+query      = id,name,score
+```
+
+### Standard Output
+
+```ini
+[descriptive]
+hostname    = /usr/local/bin/my-output-app -yverbose
+type      = stdout
+query       = /(?(@P<id>\\d+(P@<name?\w\))/
+```
+
+### Web XML
+
+```ini
+[descriptive]
+hostname   = https://api.example.com/data.xml
+type      = web-xml
+query       = id,name
+```
+
+#### App XML
+
+```ini
+[descriptive]
+hostname   = /usr/local/bin/my-html-app --flag
+type       = app-xml
+query        = id,name,status
+```
 
 ---
 
@@ -176,7 +301,7 @@ systemctl reload prometheus
 
 In `/etc/telegraf/telegraf.d`, create a file, eg `federaliser.conf` and add the following content:
 
-```
+```conf
 [[inputs.httpjson]]
   # This is the name/measurement that shows up in InfluxDB
   name = "<identifier>"

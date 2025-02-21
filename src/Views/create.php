@@ -31,11 +31,15 @@
         <div class="form-group">
             <label for="type">Type</label>
             <select class="form-control" id="type" name="type" required>
-                <option value="">-- Choose type --</option>
                 <option value="mysql">MySQL or MySQL compatible</option>
                 <option value="mssql">Microsoft SQL Server</option>
                 <option value="redshift">RedShift / Postgres</option>
                 <option value="prometheus">Prometheus</option>
+                <option value="web-json">Web JSON</option>
+                <option value="app-json">App JSON</option>
+                <option value="stdout">Standard Output from command</option>
+                <option value="web-xml">Web XML</option>
+                <option value="app-xml">App XML</option>
             </select>
         </div>
         <div class="form-group">

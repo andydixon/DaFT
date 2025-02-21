@@ -37,7 +37,17 @@
             <label for="type">Type</label>
             <select class="form-control" id="type" name="type" required>
                 <?php
-                    $types = ['mysql'=>'MySQL or MySQL compatible', 'mssql'=>'Microsoft SQL Server', 'redshift'=>'RedShift / Postgres', 'prometheus'=>'Prometheus'];
+                    $types = [
+                        'mysql'      => 'MySQL or MySQL compatible',
+                        'mssql'      => 'Microsoft SQL Server',
+                        'redshift'   => 'RedShift / Postgres',
+                        'prometheus' => 'Prometheus',
+                        'web-json'   => 'Web JSON',
+                        'app-json'   => 'App JSON',
+                        'stdout'     => 'Standard Output from command',
+                        'web-xml'    => 'Web XML',
+                        'app-xml'    => 'App XML'
+                    ];
                     $currentType = $sectionData['type'] ?? '';
                     foreach ($types as $t=>$label) {
                         $selected = ($currentType === $t) ? 'selected' : '';
