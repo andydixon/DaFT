@@ -321,6 +321,16 @@ In `/etc/telegraf/telegraf.d`, create a file, eg `federaliser.conf` and add the 
 
 Then, reload telegraf - eg `systemctl reload telegraf`
 
+## Admin Interface
+
+A basic administrative interface is provided in the `/admin` location. This interface offers full CRUD capabilities—allowing you to create, update, and delete configurations.
+
+**Important Security Notice:**
+
+- The `/admin/` area does **not** include any built-in authentication or authorization mechanisms.
+- It is your responsibility to secure this endpoint if you choose to use it in a production environment.
+- Alternatively, if you do not need this interface, it is recommended that you remove the `/public/admin/` folder entirely to prevent unauthorised access.
+
 ## Troubleshooting
 
 - Federaliser returns an **HTTP 500 error** if something goes wrong (e.g., invalid query, database connection issues, configuration errors).

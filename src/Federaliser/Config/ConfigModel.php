@@ -9,19 +9,23 @@ class ConfigModel
 
     /**
      * @param string $configFile Absolute path to config.ini
+     * @throws \Exception If the config file does not exist and cannot be created,
+     *                    or if it cannot be parsed.
      */
     public function __construct(string $configFile)
     {
         $this->configFile = $configFile;
 
         if (!file_exists($configFile)) {
-            throw new \Exception("Config file does not exist: {$configFile}");
+            // Attempt to create a blank config file.
+            if (@file_put_contents($configFile, "") === false) {
+                throw new \Exception("Config file does not exist and a blank one cannot be created: {$configFile}");
+            }
         }
 
-        $this->configData = parse_ini_file($configFile, true, INI_SCANNER_RAW);
-        if ($this->configData === false) {
-            throw new \Exception("Failed to parse config file: {$configFile}");
-        }
+        $parsedData = parse_ini_file($configFile, true, INI_SCANNER_RAW);
+        // If the file is empty, parse_ini_file returns false; in that case, set configData as an empty array.
+        $this->configData = ($parsedData === false) ? [] : $parsedData;
     }
 
     /**
@@ -166,7 +170,7 @@ class ConfigModel
         foreach ($this->configData as $section => $values) {
             $content .= "[{$section}]\n";
             foreach ($values as $key => $val) {
-                $content .= $key." = ".$val."\n";
+                $content .= $key . " = " . $val . "\n";
             }
             $content .= "\n";
         }
