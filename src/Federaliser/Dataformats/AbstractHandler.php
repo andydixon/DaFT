@@ -15,7 +15,7 @@ abstract class AbstractHandler implements DataFormatHandlerInterface
     /**
      * Constructor.
      *
-     * @param array $config Configuration with keys such as hostname, type, query, etc.
+     * @param array $config Configuration with keys such as source, type, query, etc.
      */
     public function __construct(array $config)
     {

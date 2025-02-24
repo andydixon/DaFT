@@ -19,7 +19,6 @@
 7. [Configuring Prometheus](#configuring-prometheus)
 8. [Configuring telegraf](#configuring-telegraf)
 9. [Troubleshooting](#troubleshooting)
-10. [Learn to Write Documentation](#learn-to-write-documentation)
 
 ---
 
@@ -31,7 +30,7 @@ Federaliser ensures all your data outputs are provided in a consistent format—
 
 Federaliser ensures all your data outputs are provided in a consistent format—so that no matter what your data source or output style is, you can easily integrate it with your existing monitoring and metrics systems.
 
-## Supported Data Source Types
+## Supported Database Source Types
 
 - **MySQL** (`type = mysql`)
 - **MSSQL** (`type = mssql`)
@@ -43,20 +42,43 @@ Federaliser ensures all your data outputs are provided in a consistent format—
 
 In addition to traditional database queries, Federaliser now provides a flexible data formatting layer for non-database sources. These handlers are implemented in the `Federaliser\Dataformats` namespace and normalize data from various outputs into a consistent array format (which you can then encode as JSON):
 
+## JSON Handlers
+
 - **Web JSON** (`type = web-json`)  
-  Fetches JSON data from a URL specified in the `hostname` field. If a `query` (a comma-separated list of keys) is provided, only those keys are extracted from the returned data.
+  Fetches JSON data from a URL specified in the `source` field. If a `query` (a comma-separated list of keys) is provided, only those keys are extracted from the returned data.
 
 - **App JSON** (`type = app-json`)  
-  Executes a command-line application (specified by `hostname`) that returns JSON. The output is decoded, normalized, and optionally filtered based on provided keys.
+  Executes a command-line application (specified by `source`) that returns JSON. The output is decoded, normalized, and optionally filtered based on provided keys.
 
-- **Standard Output** (`type = stdout`)  
-  Runs an external application and captures its STDOUT. When a `query` is set (as a regex pattern with named capturing groups), the output is parsed into a structured multidimensional array.
+- **File JSON** (`type = file-json`)  
+  Reads JSON data from a local file (provided via `config['source']`), decodes it into an associative array, normalizes the array, and optionally filters the data based on query keys.
+
+## XML Handlers
 
 - **Web XML** (`type = web-xml`)  
   Retrieves XML data from a URL, converts it to an associative array, and filters the data based on specified query keys if needed.
 
 - **App XML** (`type = app-xml`)  
   Executes an external application that outputs XML, converts the XML to an array, and applies filtering based on query keys.
+
+## CSV Handlers
+
+- **Web CSV** (`type = web-csv`)  
+  Retrieves CSV data from a URL (provided via `config['source']`), parses it into an associative array using the first row as column headers, normalizes the array, and optionally filters the data based on query keys.
+
+- **Standard Output CSV** (`type = stdout-csv`)  
+  Executes an external application (using the command specified in `config['source']`) and captures its STDOUT as CSV data. The output is parsed with the first row as headers and then filtered according to any specified query keys.
+
+- **File CSV** (`type = filecsv`)  
+  Reads CSV data from a local file (the file path provided in `config['source']`), parses it by using the first row as column headers, normalizes the resulting array, and applies optional filtering based on query keys.
+
+- **File XML** (`type = file-xml`)  
+  Reads XML data from a local file (provided via `config['source']`), converts the XML into an associative array, and applies optional filtering based on query keys.
+
+## Advanced Handlers
+
+- **Standard Output** (`type = stdout`)  
+  Runs an external application and captures its STDOUT. When a `query` is set (as a regex pattern with named capturing groups), the output is parsed into a structured multidimensional array.
 
 This modular approach allows you to work seamlessly with a variety of data sources and formats—all under a unified, consistent API.
 
@@ -81,7 +103,7 @@ This modular approach allows you to work seamlessly with a variety of data sourc
 
    ```ini
    [descriptive_name_this_is_myquery]
-   hostname       = myquery-sandbox.lab.andydixon.home
+   source       = myquery-sandbox.lab.andydixon.home
    port           = 3306
    type           = mysql
    identifier     = mysql-endpoint
@@ -92,10 +114,10 @@ This modular approach allows you to work seamlessly with a variety of data sourc
    ```
 
 3. **Explanation of keys**:
-   - **hostname**: The database/endpoint host.
+   - **source**: The database/endpoint host.
    - **port**: Connection port.
    - **type**: One of `mysql`, `mssql`, `redshift`, or `prometheus`.
-   - **identifier**: A unique identifier that appears in the URL (e.g., `http://HOSTNAME/federaliser/identifier`).
+   - **identifier**: A unique identifier that appears in the URL (e.g., `http://source/federaliser/identifier`).
    - **username**, **password**: Credentials for connecting to your data source.
    - **default_db**: The default database to connect to (for SQL databases).
    - **query**: The SQL query to run (if applicable).
@@ -110,7 +132,7 @@ Below are sample `config.ini` snippets for each supported data source and data f
 
 ```ini
 [descriptive]
-hostname    = mysql.example.com
+source    = mysql.example.com
 port      = 3306
 type     = mysql
 default_db  = mydatabase
@@ -123,7 +145,7 @@ query      = SELECT * FROM users
 
 ```ini
 [descriptive]
-hostname   = mssql.example.com
+source   = mssql.example.com
 port      = 1433
 type     = mssql
 default_db  = mydatabase
@@ -136,7 +158,7 @@ query    = SELECT* FROM customers
 
 ```ini
 [descriptive]
-hostname    = redshift-cluster-1.xyz.eu-west-2.redshift.amazonaws.com
+source    = redshift-cluster-1.xyz.eu-west-2.redshift.amazonaws.com
 port      = 5439
 type     = redshift
 default_db   = analytics
@@ -149,7 +171,7 @@ query     = SELECT * FROM sales LIMIT 5
 
 ```ini
 [descriptive]
-hostname  = http://prometheus.xample.com
+source  = http://prometheus.xample.com
 port      = 9090
 type     = prometheus
 query       = up
@@ -159,7 +181,7 @@ query       = up
 
 ```ini
 [descriptive]
-hostname    = https://api.example.com/data.json
+source    = https://api.example.com/data.json
 type     = web-json
 query      = id,name,status
 ```
@@ -168,7 +190,7 @@ query      = id,name,status
 
 ```ini
 [descriptive]
-hostname    = /usr/local/bin/my-json-app --option=value
+source    = /usr/local/bin/my-json-app --option=value
 type      = app-json
 query      = id,name,score
 ```
@@ -177,7 +199,7 @@ query      = id,name,score
 
 ```ini
 [descriptive]
-hostname    = /usr/local/bin/my-output-app -yverbose
+source    = /usr/local/bin/my-output-app -yverbose
 type      = stdout
 query       = /(?(@P<id>\\d+(P@<name?\w\))/
 ```
@@ -186,7 +208,7 @@ query       = /(?(@P<id>\\d+(P@<name?\w\))/
 
 ```ini
 [descriptive]
-hostname   = https://api.example.com/data.xml
+source   = https://api.example.com/data.xml
 type      = web-xml
 query       = id,name
 ```
@@ -195,7 +217,7 @@ query       = id,name
 
 ```ini
 [descriptive]
-hostname   = /usr/local/bin/my-html-app --flag
+source   = /usr/local/bin/my-html-app --flag
 type       = app-xml
 query        = id,name,status
 ```
@@ -339,6 +361,4 @@ A basic administrative interface is provided in the `/admin` location. This inte
 
 ---
 
-## Learn to Write Documentation
-
-> _“All your data are belong to us. In a consistent format, obviously.”_
+> _“All your consistent data are belong to us.”_

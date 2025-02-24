@@ -20,7 +20,7 @@ abstract class AbstractQueryHandler implements DataFormatHandlerInterface
     /**
      * Constructor.
      *
-     * @param array $params Array containing keys such as hostname, port, default_db, username, password, query, etc.
+     * @param array $params Array containing keys such as source, port, default_db, username, password, query, etc.
      */
     public function __construct(array $params)
     {

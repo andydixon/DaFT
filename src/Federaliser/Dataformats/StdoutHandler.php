@@ -2,14 +2,14 @@
 namespace Federaliser\Dataformats;
 /**
  * Class StdoutHandler
- * Executes an external application (given in hostname) and processes its STDOUT.
+ * Executes an external application (given in source) and processes its STDOUT.
  * If a query is set, it is assumed to be a regex pattern with named capturing groups.
  */
 class StdoutHandler extends AbstractHandler
 {
     public function handle(): array
     {
-        $command = $this->config['hostname'] ?? '';
+        $command = $this->config['source'] ?? '';
         $output = shell_exec($command);
         if ($output === null) {
             throw new \RuntimeException("Command execution failed: $command");

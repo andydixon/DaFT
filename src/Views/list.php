@@ -16,7 +16,7 @@
         <thead class="thead-dark">
         <tr>
             <th>Section Name</th>
-            <th>Hostname</th>
+            <th>Source</th>
             <th>Port</th>
             <th>Type</th>
             <th>Identifier</th>
@@ -29,7 +29,7 @@
         <?php foreach ($sections as $sectionName => $data): ?>
             <tr>
                 <td><?= htmlspecialchars($sectionName) ?></td>
-                <td><?= htmlspecialchars($data['hostname'] ?? '') ?></td>
+                <td><?= htmlspecialchars($data['source'] ?? '') ?></td>
                 <td><?= htmlspecialchars($data['port'] ?? '') ?></td>
                 <td><?= htmlspecialchars($data['type'] ?? '') ?></td>
                 <td><?= htmlspecialchars($data['identifier'] ?? '') ?></td>

@@ -13,7 +13,7 @@ class PrometheusHandler extends AbstractHandler
 {
     public function handle(): array
     {
-        $host  = rtrim($this->params['hostname'] ?? '', '/');
+        $host  = rtrim($this->params['source'] ?? '', '/');
         $port  = $this->params['port'] ?? 9090;
         $query = $this->params['query'] ?? 'up';
         $url   = "{$host}:{$port}/api/v1/query?query=" . urlencode($query);

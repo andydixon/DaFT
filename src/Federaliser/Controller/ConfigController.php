@@ -65,7 +65,7 @@ class ConfigController
     {
         $sectionName = $_POST['section_name'] ?? '';
         $data = [
-            'hostname'   => $_POST['hostname'] ?? '',
+            'source'   => $_POST['source'] ?? '',
             'port'       => $_POST['port'] ?? '',
             'type'       => $_POST['type'] ?? '',
             'identifier' => $_POST['identifier'] ?? '',
@@ -107,7 +107,7 @@ class ConfigController
         $oldSection = $_POST['old_section'] ?? '';
         $newSection = $_POST['section_name'] ?? '';
         $data = [
-            'hostname'   => $_POST['hostname'] ?? '',
+            'source'   => $_POST['source'] ?? '',
             'port'       => $_POST['port'] ?? '',
             'type'       => $_POST['type'] ?? '',
             'identifier' => $_POST['identifier'] ?? '',

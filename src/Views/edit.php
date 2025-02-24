@@ -31,13 +31,13 @@
             </small>
         </div>
 
-        <!-- Hostname -->
+        <!-- source -->
         <div class="form-group">
-            <label for="hostname">Hostname</label>
-            <input type="text" class="form-control" id="hostname" name="hostname"
-                   value="<?= htmlspecialchars($sectionData['hostname'] ?? '') ?>">
+            <label for="source">Source</label>
+            <input type="text" class="form-control" id="source" name="source"
+                   value="<?= htmlspecialchars($sectionData['source'] ?? '') ?>">
             <small class="form-text text-muted">
-                For databases, use the server address (e.g. mysql.example.com). For web handlers, enter the full URL (e.g. https://api.example.com/data.json). For app handlers, provide the command to run.
+                For databases, use the server address (e.g. mysql.example.com). For web handlers, enter the full URL (e.g. https://api.example.com/data.json). For app handlers, provide the command to run, and for file-based parsing, enter the full path and filename to parse.
             </small>
         </div>
 
@@ -65,7 +65,10 @@
                         'app-json'   => 'App JSON',
                         'stdout'     => 'Standard Output from command',
                         'web-xml'    => 'Web XML',
-                        'app-xml'    => 'App XML'
+                        'app-xml'    => 'App XML',
+                        'web-csv'    => 'Web CSV',
+                        'file-csv'   => 'Parse CSV file',
+                        'stdout-csv'=> 'Execute command and parse CSV output',
                     ];
                     $currentType = $sectionData['type'] ?? '';
                     foreach ($types as $t => $label) {

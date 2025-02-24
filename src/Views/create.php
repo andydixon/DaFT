@@ -27,12 +27,12 @@
                 This name is used as the header for your configuration (e.g. [descriptive]). It must be unique.
             </small>
         </div>
-        <!-- Hostname -->
+        <!-- source -->
         <div class="form-group">
-            <label for="hostname">Hostname</label>
-            <input type="text" class="form-control" id="hostname" name="hostname">
+            <label for="source">Source</label>
+            <input type="text" class="form-control" id="source" name="source">
             <small class="form-text text-muted">
-                For databases, enter the server address (e.g. mysql.example.com). For web handlers, provide the full URL (e.g. https://api.example.com/data.json). For app handlers, provide the command to execute.
+                For databases, enter the server address (e.g. mysql.example.com). For web handlers, provide the full URL (e.g. https://api.example.com/data.json). For app handlers, provide the command to execute, for file based, enter full path and filename to parse.
             </small>
         </div>
         <!-- Port -->
@@ -53,9 +53,16 @@
                 <option value="prometheus">Prometheus</option>
                 <option value="web-json">Web JSON</option>
                 <option value="app-json">App JSON</option>
-                <option value="stdout">Standard Output from command</option>
+                <option value="file-json">Parse JSON File</option>
                 <option value="web-xml">Web XML</option>
                 <option value="app-xml">App XML</option>
+                <option value="file-xml">Parse XML File</option>
+                <option value="stdout-xml">Execute command and parse XML output</option>
+                <option value="web-csv">Web CSV</option> 
+                <option value="file-csv">Parse CSV File</option>
+                <option value="stdout-csv">Execute command and parse CSV output</option>
+                <option value="stdout">Standard Output from command (with regex parsing)</option>
+
             </select>
             <small class="form-text text-muted">
                 Select the data source type or output handler. This choice determines how the other fields are interpreted. For example, choose "mysql" for a MySQL database, or "web-json" to fetch JSON data from a web URL.

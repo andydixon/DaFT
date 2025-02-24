@@ -2,13 +2,13 @@
 namespace Federaliser\Dataformats;
 /**
  * Class AppJsonHandler
- * Executes a command (specified in hostname) that outputs JSON, decodes it, normalizes it and optionally filters by keys.
+ * Executes a command (specified in source) that outputs JSON, decodes it, normalizes it and optionally filters by keys.
  */
 class AppJsonHandler extends AbstractHandler
 {
     public function handle(): array
     {
-        $command = $this->config['hostname'] ?? '';
+        $command = $this->config['source'] ?? '';
         $output = shell_exec($command);
         if ($output === null) {
             throw new \RuntimeException("Command execution failed: $command");

@@ -13,7 +13,7 @@ class MssqlHandler extends AbstractHandler
 {
     public function handle(): array
     {
-        $host   = $this->params['hostname'] ?? '';
+        $host   = $this->params['source'] ?? '';
         $port   = $this->params['port'] ?? 1433;
         $dbName = $this->params['default_db'] ?? '';
         $user   = $this->params['username'] ?? '';

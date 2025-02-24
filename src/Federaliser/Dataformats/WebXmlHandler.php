@@ -2,13 +2,13 @@
 namespace Federaliser\Dataformats;
 /**
  * Class WebXmlHandler
- * Fetches XML data via HTTP GET (from the URL in hostname), converts it to an array and optionally filters by keys.
+ * Fetches XML data via HTTP GET (from the URL in source), converts it to an array and optionally filters by keys.
  */
 class WebXmlHandler extends AbstractHandler
 {
     public function handle(): array
     {
-        $url = $this->config['hostname'] ?? '';
+        $url = $this->config['source'] ?? '';
         $xmlContent = @file_get_contents($url);
         if ($xmlContent === false) {
             throw new \RuntimeException("Unable to fetch URL: $url");
