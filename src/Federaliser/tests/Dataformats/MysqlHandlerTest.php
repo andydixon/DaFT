@@ -2,9 +2,7 @@
 
 use Federaliser\Dataformats\MysqlHandler;
 use PHPUnit\Framework\TestCase;
-use PDO;
-use PDOStatement;
-use PDOException;
+
 
 /**
  * Class MysqlHandlerTest

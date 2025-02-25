@@ -5,7 +5,7 @@
     <bootstrap>vendor/autoload.php</bootstrap>
     <testsuites>
         <testsuite name="Application Test Suite">
-            <directory>./tests/Federaliser</directory>
+            <directory>src/Federaliser/tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>

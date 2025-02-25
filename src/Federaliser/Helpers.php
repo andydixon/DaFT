@@ -69,4 +69,18 @@ class Helpers
 
         return $requestUri;
     }
+
+    public static function arrayFlatten(array $array): array
+    {
+        $result = [];
+        array_walk_recursive($array, function($value, $key) use (&$result) {
+            $result[$key] = $value;
+        });
+        return $result;
+    }
+    public static function sanitiseString(string $input): string
+    {
+        return htmlspecialchars(strip_tags($input), ENT_QUOTES, 'UTF-8');
+    }
+
 }

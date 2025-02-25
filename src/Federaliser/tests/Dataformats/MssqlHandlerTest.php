@@ -2,9 +2,7 @@
 
 use Federaliser\Dataformats\MssqlHandler;
 use PHPUnit\Framework\TestCase;
-use PDO;
-use PDOStatement;
-use PDOException;
+
 
 /**
  * Class MssqlHandlerTest
