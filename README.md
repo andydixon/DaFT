@@ -43,11 +43,9 @@ Federaliser ensures that all your data outputs are provided in a consistent form
 
 ### Refactoring and Improvements
 
-- **Dependency Injection**: Improved testability and maintainability by injecting dependencies (e.g., PDO, HTTP client) rather than instantiating them within handlers.
 - **Enhanced Security**:
   - URL and file path validation to prevent SSRF and directory traversal attacks.
   - Use of prepared statements and input sanitisation where applicable.
-- **Centralised Error Handling and Logging**: Consistent error reporting across the project.
 - **Performance Enhancements**: Optimised data normalisation and filtering; support for batch processing in database handlers.
 
 ### New Features
@@ -73,7 +71,7 @@ Federaliser supports a wide variety of data sources and formats, providing flexi
 
 ### Monitoring Systems
 
-- **Prometheus** (`type = prometheus`)
+- **Prometheus/OpenMetrics** (`type = prometheus`)
 
 ### File and Web Formats
 
