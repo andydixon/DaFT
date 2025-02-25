@@ -1,6 +1,6 @@
 {
   "name": "andydixon/federaliser",
-  "description": "A minimal PSR-4 example for a Federaliser application.",
+  "description": "A data Federaliser application.",
   "autoload": {
     "psr-4": {
       "Federaliser\\": "src/Federaliser/"
