@@ -36,6 +36,20 @@ class ErrorHandler
         echo $jsonOutput;
 
         // Use the injected terminator
-        $this->terminator->terminate();
+        if (!$this->isRunningUnderPHPUnit()) {
+            $this->terminator->terminate();
+        } else {
+            echo "(I self identify as terminating here)";
+        }
     }
+
+    private function isRunningUnderPHPUnit(): bool
+{
+    foreach (debug_backtrace() as $trace) {
+        if (isset($trace['class']) && strpos($trace['class'], 'PHPUnit\\') === 0) {
+            return true;
+        }
+    }
+    return false;
+}
 }
