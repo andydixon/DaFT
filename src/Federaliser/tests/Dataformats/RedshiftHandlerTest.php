@@ -2,9 +2,7 @@
 
 use Federaliser\Dataformats\RedshiftHandler;
 use PHPUnit\Framework\TestCase;
-use PDO;
-use PDOStatement;
-use PDOException;
+
 
 /**
  * Class RedshiftHandlerTest

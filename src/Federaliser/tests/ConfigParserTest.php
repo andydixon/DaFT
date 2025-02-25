@@ -35,7 +35,7 @@ class ConfigParserTest extends TestCase
     public function testThrowsExceptionOnMalformedConfig()
     {
         $configFile = __DIR__ . '/malformed-config.ini';
-        file_put_contents($configFile, "[settings\nkey=value"); // Missing closing bracket
+        file_put_contents($configFile, "[settings\nkey=value"); // Missing closing bracket, nonsensical format
 
         $this->expectException(ParseError::class);
         $this->configParser->parse($configFile);

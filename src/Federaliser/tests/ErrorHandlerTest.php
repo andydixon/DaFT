@@ -3,9 +3,8 @@
 use PHPUnit\Framework\TestCase;
 use Federaliser\ErrorHandler;
 use Federaliser\Terminator;
-use Exception;
-use InvalidArgumentException;
-use RuntimeException;
+
+
 
 class ErrorHandlerTest extends TestCase
 {
