@@ -109,6 +109,7 @@
                 For Prometheus, enter the PromQL query.
                 For Web or App JSON/XML types, you may provide a comma-separated list of keys to extract from the returned data.
                 For Standard Output, enter a regex pattern with named capturing groups to parse the output.
+                <br><strong>Note: </strong> For data to be exported through the Prometheus or OpenMetrics exporter, the last column must be the integer metric. Any other columns will be presented as labels, the label name is the column name, and the value is the column value.
             </small>
         </div>
         <button type="submit" class="btn btn-success">Create</button>

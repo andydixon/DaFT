@@ -130,6 +130,7 @@
                 For databases, enter the SQL query to execute. For Prometheus, enter the PromQL query.
                 For Web or App JSON/XML types, provide a comma-separated list of keys to extract.
                 For Standard Output, enter a regex with named capturing groups to parse the output.
+                <br><strong>Note: </strong> For data to be exported through the Prometheus or OpenMetrics exporter, the last column must be the integer metric. Any other columns will be presented as labels, the label name is the column name, and the value is the column value.
             </small>
         </div>
 

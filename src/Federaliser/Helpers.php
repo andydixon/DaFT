@@ -1,54 +1,72 @@
 <?php
 /**
- * Federaliser Helper functions
- * For a change lets not just dump functions here, there and everywhere. You're better than that.
- *
- * @author Andy Dixon <andy@andydixon.com>
+ * Federaliser Helper Functions
+ * 
+ * This class contains utility functions for the Federaliser application.
+ * It is designed to centralise common functionalities to promote code reuse and maintainability.
+ * 
+ * This approach avoids scattering helper functions throughout the application, 
+ * maintaining cleaner and more organised code.
+ * 
+ * Usage Example:
+ * ```
+ * // Clean the request URI
+ * $cleanUri = Helpers::cleanUri(true);
+ * ```
+ * 
+ * @author Andy Dixon
  * @created 2025-01-16
+ * @namespace Federaliser
  */
 
 namespace Federaliser;
 
 class Helpers
 {
-
-
     /**
-     * Check to see if prometheus is required exporter
-     * @return bool
+     * Cleans the REQUEST_URI to get the route path.
+     * 
+     * This method:
+     * - Retrieves the REQUEST_URI from the global `$_SERVER` superglobal.
+     * - Strips query strings (e.g., `?param=value`).
+     * - Removes leading and trailing slashes.
+     * - Optionally removes the `/prometheus` suffix if `$removePrometheus` is `true`.
+     * 
+     * Example Usage:
+     * ```
+     * // Basic usage without removing Prometheus suffix
+     * $route = Helpers::cleanUri();
+     * 
+     * // Usage with Prometheus suffix removal
+     * $route = Helpers::cleanUri(true);
+     * ```
+     * 
+     * @param bool $removePrometheus Optional. If true, removes the `/prometheus` suffix from the URI.
+     * 
+     * @return string Cleaned route path.
      */
-    public static function isPrometheusExporter(): bool
+    public static function cleanUri(bool $removePrometheus = false): string 
     {
-        $requestUri = self::cleanUri();
-        return str_ends_with($requestUri, '/prometheus');
-    }
-
-    /**
-     * Clean the URI to get the route
-     * @param $removePrometheus boolean remove prometheus exporter tag if it is there
-     * @return string
-     */
-    public static function cleanUri(bool $removePrometheus=false): string {
-        // Simplest possible approach: parse the REQUEST_URI
+        // Get the REQUEST_URI or default to root
         $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 
-        // Strip any query string (e.g. ?param=value)
+        // Strip any query string (e.g., ?param=value)
         if (($pos = strpos($requestUri, '?')) !== false) {
             $requestUri = substr($requestUri, 0, $pos);
         }
 
-        // Ensure it doesn't start or end with slash
-        $requestUri= trim($requestUri, '/');
+        // Trim leading and trailing slashes
+        $requestUri = trim($requestUri, '/');
 
-        if($removePrometheus) {
-            // Check to see if this is prometheus exporter
-            $suffix = '/prometheus';
+        // Optionally remove the '/prometheus' suffix
+        if ($removePrometheus) {
+            $suffix = 'prometheus';
             if (str_ends_with($requestUri, $suffix)) {
-                $requestUri = substr($requestUri, 0, -strlen($suffix)); // Remove the suffix
+                $requestUri = substr($requestUri, 0, -strlen($suffix));
+                $requestUri = rtrim($requestUri, '/');
             }
         }
 
         return $requestUri;
-
     }
 }
