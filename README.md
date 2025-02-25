@@ -1,3 +1,5 @@
+# Federaliser
+
 **Federaliser** is a powerful and flexible data integration tool designed to collect data from multiple sources (MySQL, MSSQL, Redshift/Postgres, Prometheus, JSON, XML, and CSV) and export it in a consistent format. It supports JSON output suitable for Telegraf and text-based output compatible with Prometheus/OpenMetrics.
 
 ---
