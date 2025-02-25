@@ -13,8 +13,7 @@ class ErrorHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->terminatorMock = $this->createMock(Terminator::class);
-        $this->errorHandler = new ErrorHandler($this->terminatorMock);
+        $this->errorHandler = new ErrorHandler();
     }
 
     public function testHandleErrorReturnsStructuredJsonResponse()
