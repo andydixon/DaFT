@@ -2,58 +2,79 @@
 
 use PHPUnit\Framework\TestCase;
 use Federaliser\ErrorHandler;
-use Psr\Log\LoggerInterface;
+use Federaliser\Terminator;
+use Exception;
+use InvalidArgumentException;
+use RuntimeException;
 
 class ErrorHandlerTest extends TestCase
 {
-    private $loggerMock;
+    private $terminatorMock;
     private $errorHandler;
 
     protected function setUp(): void
     {
-        $this->loggerMock = $this->createMock(LoggerInterface::class);
-        $this->errorHandler = new ErrorHandler($this->loggerMock);
+        $this->terminatorMock = $this->createMock(Terminator::class);
+        $this->errorHandler = new ErrorHandler($this->terminatorMock);
     }
 
-    public function testHandlesExceptionAndReturnsJsonResponse()
+    public function testHandleErrorReturnsStructuredJsonResponse()
     {
-        $exception = new Exception('Test Exception', 500);
+        $errno = E_WARNING;
+        $errstr = 'Test Warning';
+        $errfile = 'testfile.php';
+        $errline = 42;
 
-        $response = $this->errorHandler->handleException($exception);
+        ob_start();
+        $this->errorHandler->handleError($errno, $errstr, $errfile, $errline);
+        $output = ob_get_clean();
+
+        $response = json_decode($output, true);
 
         $this->assertIsArray($response);
-        $this->assertEquals(500, $response['status']);
-        $this->assertEquals('Test Exception', $response['message']);
+        $this->assertEquals('CORE_ERROR', $response['status']);
+        $this->assertEquals('Test Warning', $response['message']);
+        $this->assertEquals('testfile.php', $response['debug']['file']);
+        $this->assertEquals(42, $response['debug']['line']);
     }
 
-    public function testHandlesCustomExceptionWithSpecificStatusCode()
+    public function testHandleErrorSetsHttpHeaders()
     {
-        $exception = new InvalidArgumentException('Invalid Input', 400);
+        $errno = E_ERROR;
+        $errstr = 'Test Error';
+        $errfile = 'errorfile.php';
+        $errline = 99;
 
-        $response = $this->errorHandler->handleException($exception);
+        ob_start();
+        $this->errorHandler->handleError($errno, $errstr, $errfile, $errline);
+        ob_end_clean();
 
-        $this->assertEquals(400, $response['status']);
-        $this->assertEquals('Invalid Input', $response['message']);
+        $headers = headers_list();
+
+        $this->assertContains('HTTP/1.1 500 Internal Server Error', $headers);
+        $this->assertContains('Content-Type: application/json', $headers);
     }
 
-    public function testLogsErrorWhenExceptionOccurs()
+    public function testHandleErrorDoesNotExitDuringTest()
     {
-        $exception = new Exception('Logging Test', 500);
+        $this->terminatorMock->expects($this->once())
+                             ->method('terminate')
+                             ->willReturn(null); // Mocking exit to do nothing
 
-        $this->loggerMock->expects($this->once())
-                         ->method('error')
-                         ->with('Logging Test', ['exception' => $exception]);
+        $errno = E_WARNING;
+        $errstr = 'Test Warning';
+        $errfile = 'testfile.php';
+        $errline = 42;
 
-        $this->errorHandler->handleException($exception);
-    }
+        ob_start();
+        $this->errorHandler->handleError($errno, $errstr, $errfile, $errline);
+        $output = ob_get_clean();
 
-    public function testHandlesUnhandledExceptionWithGenericError()
-    {
-        $exception = new RuntimeException('Unhandled Exception');
+        $response = json_decode($output, true);
 
-        $response = $this->errorHandler->handleException($exception);
-
-        $this->assertEquals(500, $response['status']);
-        $this->assertEquals('An unexpected error occurred.', $response['message']);
+        $this->assertEquals('CORE_ERROR', $response['status']);
+        $this->assertEquals('Test Warning', $response['message']);
+        $this->assertEquals('testfile.php', $response['debug']['file']);
+        $this->assertEquals(42, $response['debug']['line']);
     }
 }
