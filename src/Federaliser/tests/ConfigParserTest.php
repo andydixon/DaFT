@@ -9,7 +9,7 @@ class ConfigParserTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->configParser = new ConfigParser('/path/to/config.ini');
+        $this->configParser = new ConfigParser(__DIR__ .'/test-config.ini');
     }
 
     public function testParsesValidConfigFile()
@@ -17,7 +17,8 @@ class ConfigParserTest extends TestCase
         $configFile = __DIR__ . '/mock-config.ini';
         file_put_contents($configFile, "[settings]\nkey=value");
 
-        $result = $this->configParser->parse($configFile);
+        $cp = new ConfigParser($configFile);
+        $result = $cp->getConfig();
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('settings', $result);
@@ -29,7 +30,8 @@ class ConfigParserTest extends TestCase
     public function testThrowsExceptionOnInvalidFilePath()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->configParser->parse('/invalid/path/to/config.ini');
+        $cp = new ConfigParser('/invalid/path/to/config.ini');
+        $result = $cp->getConfig();
     }
 
     public function testThrowsExceptionOnMalformedConfig()
@@ -38,7 +40,9 @@ class ConfigParserTest extends TestCase
         file_put_contents($configFile, "[settings\nkey=value"); // Missing closing bracket, nonsensical format
 
         $this->expectException(ParseError::class);
-        $this->configParser->parse($configFile);
+        
+        $cp = new ConfigParser($configFile);
+        $result = $cp->getConfig();
 
         unlink($configFile);
     }
@@ -48,7 +52,8 @@ class ConfigParserTest extends TestCase
         $configFile = __DIR__ . '/empty-config.ini';
         file_put_contents($configFile, "");
 
-        $result = $this->configParser->parse($configFile);
+        $cp = new ConfigParser($configFile);
+        $result = $cp->getConfig();
 
         $this->assertIsArray($result);
         $this->assertEmpty($result);

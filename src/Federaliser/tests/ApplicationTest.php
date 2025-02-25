@@ -13,7 +13,7 @@ class ApplicationTest extends TestCase
     protected function setUp(): void
     {
         $this->routerMock = $this->createMock(Router::class);
-        $this->application = new Application('/path/to/config.ini');
+        $this->application = new Application(__DIR__.'/test-config.ini');
     }
 
     public function testInitializationWithValidConfig()
@@ -24,12 +24,11 @@ class ApplicationTest extends TestCase
     public function testThrowsExceptionOnInvalidConfig()
     {
         $this->expectException(InvalidArgumentException::class);
-        new Application('/invalid/path/to/config.ini');
+        new Application(__DIR__.'/invalid-config.ini');
     }
 
     public function testConfigurationParsing()
     {
-        $this->application->parseConfig();
         $configData = $this->application->getConfigData();
 
         $this->assertIsArray($configData);

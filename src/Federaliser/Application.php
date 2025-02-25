@@ -138,6 +138,11 @@ class Application
         }
     }
 
+    public function getConfigData()
+    {
+        return $this->configData;
+    }
+
     /**
      * Runs the application by dispatching the request to the router.
      * 
