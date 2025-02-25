@@ -1,98 +1,44 @@
 <?php
-/**
- * Federaliser Configuration Model Class
- * 
- * This class manages the configuration data stored in an INI file.
- * It supports CRUD operations on sections and key-value pairs, ensuring data integrity and validation.
- * 
- * Features:
- * - Automatically creates a blank config file if it does not exist.
- * - Parses INI files with sections (`parse_ini_file` with `sections=true`).
- * - Validates configuration data, including unique identifiers and allowed types.
- * - Provides methods to get, create, update, and delete sections.
- * - Writes configuration changes back to the `.ini` file.
- * 
- * Usage Example:
- * ```
- * $configModel = new ConfigModel('/path/to/config.ini');
- * 
- * // Get all sections
- * $allSections = $configModel->getAll();
- * 
- * // Get a single section
- * $sectionData = $configModel->get('example_section');
- * 
- * // Create a new section
- * $configModel->create('new_section', [
- *     'type' => 'mysql',
- *     'identifier' => 'example'
- * ]);
- * 
- * // Update an existing section
- * $configModel->update('existing_section', 'renamed_section', [
- *     'type' => 'redshift',
- *     'identifier' => 'new_example'
- * ]);
- * 
- * // Delete a section
- * $configModel->delete('obsolete_section');
- * ```
- * 
- * @author Andy Dixon
- * @created 2025-01-16
- * @namespace Federaliser\Config
- */
 
 namespace Federaliser\Config;
 
-use Exception;
+use RuntimeException;
 
+/**
+ * Class ConfigModel
+ * Manages the reading, writing, and validation of configuration files.
+ */
 class ConfigModel
 {
-    /**
-     * @var string Absolute path to the configuration file.
-     */
     private string $configFile;
-
-    /**
-     * @var array Parsed configuration data as an associative array.
-     */
     private array $configData = [];
 
     /**
-     * ConfigModel constructor.
-     * 
-     * Initialises the configuration model by:
-     * - Setting the file path.
-     * - Checking if the file exists or creating a blank one.
-     * - Parsing the configuration file into `$configData`.
-     * 
-     * @param string $configFile Absolute path to config.ini.
-     * 
-     * @throws \Exception If the file cannot be created or parsed.
+     * Constructor.
+     *
+     * @param string $configFile Absolute path to config.ini
+     * @throws RuntimeException If the config file does not exist or cannot be parsed.
      */
     public function __construct(string $configFile)
     {
         $this->configFile = $configFile;
 
-        // Check if the config file exists, otherwise create a blank one
         if (!file_exists($configFile)) {
+            // Attempt to create a blank config file.
             if (@file_put_contents($configFile, "") === false) {
-                throw new Exception("Config file does not exist and a blank one cannot be created: {$configFile}");
+                throw new RuntimeException("Config file does not exist and a blank one cannot be created: {$configFile}");
             }
         }
 
-        // Parse the INI file with sections and raw scanning mode
         $parsedData = parse_ini_file($configFile, true, INI_SCANNER_RAW);
-
-        // If the file is empty, set configData as an empty array
+        // If the file is empty, parse_ini_file returns false; in that case, set configData as an empty array.
         $this->configData = ($parsedData === false) ? [] : $parsedData;
     }
 
     /**
-     * Retrieve all sections in config.ini.
-     * 
-     * @return array Associative array of all configuration sections.
+     * Retrieve all sections in config.ini
+     *
+     * @return array
      */
     public function getAll(): array
     {
@@ -100,11 +46,10 @@ class ConfigModel
     }
 
     /**
-     * Retrieve a single section by name.
-     * 
-     * @param string $section Name of the section to retrieve.
-     * 
-     * @return array|null Array of key-value pairs in the section, or null if the section does not exist.
+     * Retrieve a single section by name
+     *
+     * @param string $section Section name
+     * @return array|null
      */
     public function get(string $section): ?array
     {
@@ -112,24 +57,18 @@ class ConfigModel
     }
 
     /**
-     * Create a new section.
-     * 
-     * - Validates the data.
-     * - Checks if the section already exists.
-     * - Ensures the identifier is unique.
-     * - Writes the updated configuration to the file.
-     * 
-     * @param string $section Name of the section (text in [brackets]).
-     * @param array  $data    Key-value pairs for that section.
-     * 
-     * @throws \Exception If the section already exists or if validation fails.
+     * Create a new section
+     *
+     * @param string $section Name of the section (the text in [brackets])
+     * @param array  $data    Key-value pairs for that section
+     * @throws RuntimeException If validation fails or the section already exists.
      */
     public function create(string $section, array $data): void
     {
         $this->validateData($data);
 
         if (isset($this->configData[$section])) {
-            throw new Exception("Section already exists: {$section}");
+            throw new RuntimeException("Section already exists: {$section}");
         }
 
         $this->checkUniqueIdentifier($data['identifier']);
@@ -139,68 +78,109 @@ class ConfigModel
     }
 
     /**
-     * Validate the data:
-     * - 'type' must be one of (mysql, mssql, redshift, prometheus).
-     * - 'identifier' must be lowercase.
-     * 
-     * @param array $data Key-value pairs to validate.
-     * 
-     * @throws \Exception If validation fails.
+     * Update an existing section
+     *
+     * @param string $oldSection  Existing section name
+     * @param string $newSection  New section name (could be same as old if not renaming)
+     * @param array  $data        Key-value pairs for that section
+     * @throws RuntimeException If validation fails or the section does not exist.
+     */
+    public function update(string $oldSection, string $newSection, array $data): void
+    {
+        if (!isset($this->configData[$oldSection])) {
+            throw new RuntimeException("Section does not exist: {$oldSection}");
+        }
+
+        $this->validateData($data);
+
+        // If the identifier changed, check that the new one is unique
+        $oldIdentifier = $this->configData[$oldSection]['identifier'] ?? '';
+        if ($oldIdentifier !== $data['identifier']) {
+            $this->checkUniqueIdentifier($data['identifier']);
+        }
+
+        // If the name of the section changes, remove the old and add the new
+        if ($oldSection !== $newSection) {
+            unset($this->configData[$oldSection]);
+        }
+
+        $this->configData[$newSection] = $data;
+        $this->write();
+    }
+
+    /**
+     * Delete an existing section
+     *
+     * @param string $section Section name
+     * @throws RuntimeException If the section does not exist.
+     */
+    public function delete(string $section): void
+    {
+        if (!isset($this->configData[$section])) {
+            throw new RuntimeException("Section does not exist: {$section}");
+        }
+
+        unset($this->configData[$section]);
+        $this->write();
+    }
+
+    /**
+     * Validate the data before saving.
+     *
+     * @param array $data Configuration data to validate.
+     * @throws RuntimeException If validation fails.
      */
     private function validateData(array $data): void
     {
-        $validTypes = ['mysql', 'mssql', 'redshift', 'prometheus'];
+        $validTypes = ['mysql', 'mssql', 'redshift', 'prometheus', 'web-json', 'app-json', 'file-json', 'web-xml', 'app-xml', 'file-xml', 'web-csv', 'stdout-csv', 'file-csv', 'stdout'];
 
-        if (!isset($data['type']) || !in_array($data['type'], $validTypes, true)) {
-            throw new Exception("Invalid type. Must be one of: ".implode(', ', $validTypes).".");
+        if (empty($data['identifier']) || !is_string($data['identifier'])) {
+            throw new RuntimeException("Invalid identifier. It must be a non-empty string.");
         }
 
-        if (!isset($data['identifier']) || $data['identifier'] !== strtolower($data['identifier'])) {
-            throw new Exception("Identifier must be lowercase.");
+        if (!isset($data['type']) || !in_array($data['type'], $validTypes, true)) {
+            throw new RuntimeException("Invalid type. Must be one of: " . implode(', ', $validTypes) . ".");
+        }
+
+        if (!isset($data['source']) || empty($data['source'])) {
+            throw new RuntimeException("Source is required and cannot be empty.");
         }
     }
 
     /**
-     * Ensure the identifier is unique across all sections.
-     * 
-     * @param string $identifier Identifier to check for uniqueness.
-     * 
-     * @throws \Exception If the identifier is not unique.
+     * Ensure identifier is unique across all sections.
+     *
+     * @param string $identifier Identifier to check.
+     * @throws RuntimeException If the identifier is not unique.
      */
     private function checkUniqueIdentifier(string $identifier): void
     {
-        foreach ($this->configData as $sectionData) {
-            if (isset($sectionData['identifier']) && $sectionData['identifier'] === $identifier) {
-                throw new Exception("Identifier '{$identifier}' is already used in another section.");
+        foreach ($this->configData as $section => $values) {
+            if (isset($values['identifier']) && $values['identifier'] === $identifier) {
+                throw new RuntimeException("Identifier '{$identifier}' is already used in another section.");
             }
         }
     }
 
     /**
-     * Writes the configuration data back to the .ini file.
-     * 
-     * - Constructs the .ini file content from the `$configData` array.
-     * - Each section is written with its key-value pairs.
-     * - Ensures consistent formatting and error handling.
-     * 
-     * @throws \Exception If the file cannot be written.
+     * Write the array structure back to the config.ini file.
+     *
+     * @throws RuntimeException If writing to the config file fails.
      */
     private function write(): void
     {
-        $content = '';
+        $content = "";
 
         foreach ($this->configData as $section => $values) {
             $content .= "[{$section}]\n";
             foreach ($values as $key => $val) {
-                // Escape any special characters
-                $escapedVal = addslashes($val);
-                $content .= "{$key} = \"{$escapedVal}\"\n";
+                $content .= $key . " = " . $val . "\n";
             }
             $content .= "\n";
         }
 
         if (file_put_contents($this->configFile, $content) === false) {
-            throw new Exception("Failed to write to config file: {$this->configFile}");
+            throw new RuntimeException("Failed to write to config file: {$this->configFile}");
         }
     }
 }
