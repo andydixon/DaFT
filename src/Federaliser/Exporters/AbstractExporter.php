@@ -40,7 +40,7 @@ class AbstractExporter
      * 
      * @return void
      */
-    public static function export($data, $statusCode, $additionalConfig): void
+    public static function export(array $data, int $statusCode, array $additionalConfig): void
     {
         // Set HTTP status to 501 Not Implemented
         header("HTTP/1.1 501 Not Implemented");

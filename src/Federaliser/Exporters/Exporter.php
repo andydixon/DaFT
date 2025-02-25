@@ -34,6 +34,7 @@ class Exporter
     const PROMETHEUS_EXPORTER = 1;
     const OPENMETRICS_EXPORTER = 2;
     const JSON_EXPORTER = 3;
+    const TELEGRAF_EXPORTER = 4;
 
     /**
      * Identifies the export format based on the request URI.
@@ -75,7 +76,8 @@ class Exporter
 
             case "json":
                 return self::JSON_EXPORTER;
-
+            case 'telegraf':
+                return self::TELEGRAF_EXPORTER;
             default:
                 // Default to JSON_EXPORTER if no match is found
                 return self::JSON_EXPORTER;

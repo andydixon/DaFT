@@ -126,7 +126,9 @@ class Application
                     case Exporter::OPENMETRICS_EXPORTER:
                         Exporters\OpenmetricsExporter::export($result, 200, $exporterOptions);
                         break;
-
+                    case Exporter::TELEGRAF_EXPORTER:
+                        Exporters\TelegrafExporter::export($result, 200, $exporterOptions);
+                        break;
                     case Exporter::JSON_EXPORTER:
                     default:
                         Exporters\JsonExporter::export($result, 200, $exporterOptions);

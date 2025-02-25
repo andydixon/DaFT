@@ -194,10 +194,26 @@ http://<YOUR_HOST>/<identifier>/prometheus
 
 Federaliser supports multiple export formats for different use cases.
 
-### JSON Exporter
+### JSON Exporter (default)
 
 - Outputs data as a JSON object.
-- Suitable for integration with Telegraf, custom dashboards, or any JSON-based pipeline.
+- Suitable for integration with custom dashboards, or any JSON-based pipeline.
+
+### Telegraf Exporter
+
+- Outputs data as a single-level JSON object suitable for Telegraf.
+- **Column 0** becomes the key, and **Column 1** becomes the value.
+- Example:
+  ```json
+  {
+    "cpu_usage": 5,
+    "memory_usage": 27,
+    "disk_usage": 32
+  }
+  ```
+- Throws `400 Bad Request` if:
+  - More than 2 columns are present.
+  - Non-numeric value is found.
 
 ## Prometheus Exporter Notes
 
@@ -395,7 +411,7 @@ Create a configuration file (e.g., `federaliser.conf`) in `/etc/telegraf/telegra
 ```toml
 [[inputs.http]]
   name = "<identifier>"
-  urls = ["http://<YOUR_HOST>/<identifier>"]
+  urls = ["http://<YOUR_HOST>/<identifier>/telegraf"]
   method = "GET"
   response_timeout = "55s"
   interval = "1m"
