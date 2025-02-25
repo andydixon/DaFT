@@ -24,9 +24,11 @@ class OpenmetricsExporter extends AbstractExporter {
      * @return void
      */
     public static function export($data, $statusCode, $additionalConfig): void {
+        $headerHandler = self::$headerHandler ?? 'header';
+
         // Set the identifier or default to 'metric'
         $identifier = isset($additionalConfig['identifier']) ? $additionalConfig['identifier'] : 'metric';
-        header("Content-Type: text/plain");
+        $headerHandler("Content-Type: text/plain");
 
         foreach ($data as $row) {
             // Get all keys and identify the last key as the metric

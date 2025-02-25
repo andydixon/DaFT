@@ -22,7 +22,9 @@ class TelegrafExporter extends AbstractExporter
      */
     public static function export(array $data, int $statusCode = 200, $additionalConfig = []): void
     {
-        header('Content-Type: application/json; charset=utf-8', true, $statusCode);
+        $headerHandler = self::$headerHandler ?? 'header';
+
+        $headerHandler('Content-Type: application/json; charset=utf-8', true, $statusCode);
 
         $telegrafData = [];
 

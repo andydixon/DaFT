@@ -51,4 +51,11 @@ class AbstractExporter
         // Output error message and terminate script execution
         die('Exporter not defined.');
     }
+
+    static $headerHandler;
+
+    public static function setHeaderHandler($handler)
+    {
+        self::$headerHandler = $handler;
+    }
 }

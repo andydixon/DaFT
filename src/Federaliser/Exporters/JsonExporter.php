@@ -18,7 +18,7 @@
 
 namespace Federaliser\Exporters;
 
-class JsonExporter
+class JsonExporter extends AbstractExporter
 {
     /**
      * Exports data as a JSON response.
@@ -45,8 +45,10 @@ class JsonExporter
      */
     public static function export(array $data, int $statusCode = 200, array $additionalConfig = []): void
     {
+        $headerHandler = self::$headerHandler ?? 'header';
+
         // Set Content-Type header to application/json with UTF-8 encoding
-        header('Content-Type: application/json; charset=utf-8', true, $statusCode);
+        $headerHandler('Content-Type: application/json; charset=utf-8', true, $statusCode);
 
         // Encode data as JSON with numeric check and UTF-8 support
         $jsonOutput = json_encode($data, JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
