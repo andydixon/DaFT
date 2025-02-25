@@ -63,12 +63,10 @@ class JsonExporter extends AbstractExporter
                 'error' => 'JSON encoding error',
                 'message' => json_last_error_msg()
             ]);
+        } else {
 
-            exit;
+            // Output the JSON-encoded data and terminate script execution
+            echo $jsonOutput;
         }
-
-        // Output the JSON-encoded data and terminate script execution
-        echo $jsonOutput;
-        exit;
     }
 }

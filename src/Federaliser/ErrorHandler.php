@@ -3,12 +3,6 @@ namespace Federaliser;
 
 class ErrorHandler
 {
-    private $terminator;
-
-    public function __construct(Terminator $terminator)
-    {
-        $this->terminator = $terminator;
-    }
 
     public function handleError($errno, $errstr, $errfile, $errline): void
     {
@@ -37,7 +31,7 @@ class ErrorHandler
 
         // Use the injected terminator
         if (!$this->isRunningUnderPHPUnit()) {
-            $this->terminator->terminate();
+            exit;
         } else {
             echo "(I self identify as terminating here)";
         }
