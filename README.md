@@ -28,8 +28,10 @@
 11. [Configuring Prometheus](#configuring-prometheus)
 12. [Configuring Telegraf](#configuring-telegraf)
 13. [Admin Interface](#admin-interface)
-14. [Troubleshooting](#troubleshooting)
-15. [Contribution and Feedback](#contribution-and-feedback)
+14. [Using Docker](#using-docker-for-federaliser)
+    - [Using in Production](#4-deploying-in-production)
+15. [Troubleshooting](#troubleshooting)
+16. [Contribution and Feedback](#contribution-and-feedback)
 
 ---
 
@@ -256,6 +258,162 @@ mysql_metrics{host="server2", status="idle"} 17
 
 ---
 
+### **Advanced JSON Handling in Web & App Handlers**
+
+The `web-json` and `app-json` handlers in **Federaliser** allow for powerful JSON extraction and filtering, enabling users to:
+
+- Extract **specific paths** from deeply nested JSON.
+- Select only **certain fields** from the extracted data.
+- Maintain **full backward compatibility** (default behavior is unchanged).
+
+---
+
+## **Configurable JSON Extraction Options**
+
+| Key         | Description                                          | Example Value                       |
+| ----------- | ---------------------------------------------------- | ----------------------------------- |
+| `source`    | URL (for `web-json`) or command (for `app-json`)     | `https://api.example.com/data.json` |
+| `type`      | The handler type (`web-json` or `app-json`)          | `web-json`                          |
+| `json_path` | _(Optional)_ Extract a **specific JSON path**        | `data.items`                        |
+| `fields`    | _(Optional)_ Select **specific fields** from results | `id,name,score`                     |
+
+---
+
+## **How JSON Path Extraction Works**
+
+The `json_path` option lets you specify **a dot-separated path** within a JSON response.
+
+For example, given this API response:
+
+```
+{
+    "status": "success",
+    "data": {
+        "items": [
+            { "id": 1, "name": "Alice", "score": 95 },
+            { "id": 2, "name": "Bob", "score": 88 }
+        ]
+    }
+}
+```
+
+You can extract **only `data.items`** using this configuration:
+
+```
+source = "https://api.example.com/data.json"
+type = "web-json"
+json_path = "data.items"
+```
+
+**Returned Output:**
+
+```
+[
+    { "id": 1, "name": "Alice", "score": 95 },
+    { "id": 2, "name": "Bob", "score": 88 }
+]
+```
+
+---
+
+## **Field Filtering: Selecting Only the Data You Need**
+
+The `fields` option allows you to select **only certain fields** from the extracted data.
+
+For example, with this configuration:
+
+```
+source = "https://api.example.com/data.json"
+type = "web-json"
+json_path = "data.items"
+fields = "id,name"
+```
+
+**Returned Output:**
+
+```
+[
+    { "id": 1, "name": "Alice" },
+    { "id": 2, "name": "Bob" }
+]
+```
+
+---
+
+## **Handling Single JSON Objects**
+
+If the extracted `json_path` points to a **single JSON object**, it will be returned **as an object** instead of an array.
+
+**Example JSON Response**
+
+```
+{
+    "metadata": {
+        "info": {
+            "version": "1.0",
+            "author": "Admin"
+        }
+    }
+}
+```
+
+**Configuration**
+
+```
+source = "https://api.example.com/data.json"
+type = "web-json"
+json_path = "metadata.info"
+```
+
+**Returned Output:**
+
+```
+{
+    "version": "1.0",
+    "author": "Admin"
+}
+```
+
+---
+
+## **Using App JSON Handler**
+
+The `app-json` handler **works exactly the same**, but instead of fetching JSON from a web URL, it **runs a shell command** that outputs JSON.
+
+**Example Configuration**
+
+```
+source = "/usr/local/bin/my-json-app --option=value"
+type = "app-json"
+json_path = "response.results"
+fields = "id,score"
+```
+
+**Expected Output:**
+
+```
+[
+    { "id": 1, "score": 95 },
+    { "id": 2, "score": 88 }
+]
+```
+
+---
+
+## **What Happens If a Path Doesn’t Exist?**
+
+If the specified `json_path` does not exist in the response:
+
+- Instead of returning an error, it will **return an empty array (`[]`)**.
+
+If the specified `fields` don’t exist in the extracted data:
+
+- Those fields will **be ignored** without errors.
+
+This ensures **consistent behavior** and prevents API failures due to missing keys.
+
+---
+
 ## Extending Federaliser
 
 Federaliser is designed to be extensible. You can add new Data Handlers and Exporters to support additional data sources and output formats.
@@ -437,6 +595,249 @@ Federaliser includes an optional **Admin Interface** accessible at `/admin`. Thi
 - The `/admin/` area **does not** include built-in authentication or authorisation mechanisms.
 - It is highly recommended to **secure this endpoint** with web server-level authentication if using in a production environment.
 - Alternatively, if not needed, **delete the `/public/admin/` folder** to prevent unauthorised access.
+
+---
+
+# Using Docker for Federaliser
+
+Federaliser can be deployed as a **Docker container** for both **production** and **development** environments. This section provides detailed instructions for building, configuring, and running the Docker image.
+
+---
+
+## Prerequisites
+
+Ensure you have the following installed:
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/) (optional, but recommended for development)
+
+Check your installations:
+
+```bash
+docker --version
+docker-compose --version
+```
+
+---
+
+## Configuration Management
+
+Federaliser uses an **INI configuration file** located within the container:
+
+```
+/var/www/html/config.ini
+```
+
+This file is **mapped from the host to the Docker container**, allowing you to:
+
+- Edit configurations on the host without rebuilding the image.
+- Manage configurations in version control.
+
+---
+
+## Building the Docker Image
+
+1. **Clone the Repository** (if you haven't already):
+
+```bash
+git clone https://github.com/your-repo/federaliser.git
+cd federaliser
+```
+
+2. **Build the Docker Image**:
+
+```bash
+docker build -t federaliser-app .
+```
+
+- The `-t` flag assigns a name (`federaliser-app`) to the image.
+- This builds the image using the `Dockerfile` in the current directory.
+
+---
+
+## Running in Production
+
+In production, the focus is on **performance, security, and scalability**. A prebuilt image can be started with:
+
+```
+docker run -v /path/to/config.ini:/var/www/html/config.ini nddxn/federaliser
+```
+
+Alternatively, a container can be built with the bleeding-edge version:
+
+### 1. Start the Container:
+
+```bash
+docker run -d \
+  -p 8080:80 \
+  --name federaliser \
+  -v $(pwd)/config/config.ini:/var/www/html/config.ini \
+  federaliser-app
+```
+
+### 2. Configuration:
+
+- The `-v` flag maps the configuration file to the container.
+- Edit `config/config.ini` on the host to change configurations.
+- Changes are instantly reflected without rebuilding the image.
+
+### 3. Scaling with Docker Compose:
+
+For easier scaling and management, use Docker Compose:
+
+```yaml
+version: "3.7"
+
+services:
+  app:
+    image: federaliser-app:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./config/config.ini:/var/www/html/config.ini
+    restart: always
+```
+
+**Start with**:
+
+```bash
+docker-compose up -d
+```
+
+### 4. Deploying in Production:
+
+- Use a **reverse proxy** like **Nginx** or **Traefik** to handle SSL and load balancing.
+- Consider using **Kubernetes** or **AWS ECS** for container orchestration.
+
+### 5. Environment Variables:
+
+Override configuration using environment variables:
+
+```bash
+docker run -d \
+  -e DB_HOST="prod-db.example.com" \
+  -e DB_USER="prod_user" \
+  -e DB_PASS="securepassword" \
+  -p 80:80 \
+  federaliser-app
+```
+
+---
+
+## Running in Development
+
+Development mode uses **volume mapping** for hot-reloading and easier debugging.
+
+### 1. Start the Container:
+
+```bash
+docker run -d \
+  -p 8080:80 \
+  --name federaliser-dev \
+  -v $(pwd)/config/config.ini:/var/www/html/config.ini \
+  -v $(pwd)/src:/var/www/html/src \
+  -v $(pwd)/public:/var/www/html/public \
+  federaliser-app
+```
+
+### 2. Configuration:
+
+- The `-v` flags map the `src`, `public`, and `config` directories for hot-reloading.
+- Changes made on the host are instantly reflected inside the container.
+- Ideal for rapid development and testing.
+
+### 3. Using Docker Compose:
+
+```yaml
+version: "3.7"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ./config/config.ini:/var/www/html/config.ini
+      - ./src:/var/www/html/src
+      - ./public:/var/www/html/public
+    environment:
+      - APP_ENV=development
+    restart: always
+```
+
+**Start with**:
+
+```bash
+docker-compose up -d
+```
+
+**Stop with**:
+
+```bash
+docker-compose down
+```
+
+### 4. Debugging and Accessing the Container:
+
+```bash
+docker exec -it federaliser-dev bash
+```
+
+### 5. Install Dependencies:
+
+After starting the container, install dependencies with:
+
+```bash
+docker exec -it federaliser-dev composer install
+```
+
+---
+
+## Troubleshooting and Tips
+
+### 1. Viewing Logs
+
+To view application logs:
+
+```bash
+docker logs -f federaliser-app
+```
+
+Or with `docker-compose`:
+
+```bash
+docker-compose logs -f app
+```
+
+### 2. Rebuilding the Image
+
+If you make changes to the `Dockerfile` or dependencies, rebuild the image:
+
+```bash
+docker-compose build
+```
+
+### 3. Clearing Cache
+
+Clear PHP's OPcache and application cache by restarting the container:
+
+```bash
+docker-compose restart app
+```
+
+### 4. Stopping and Removing Containers
+
+```bash
+docker-compose down
+```
+
+### 5. Updating Dependencies
+
+```bash
+docker-compose exec app composer update
+```
 
 ---
 

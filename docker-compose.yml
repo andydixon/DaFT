@@ -1,0 +1,14 @@
+version: "3.7"
+# @warning: This is used for development purposes only, not production
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ./config/config.ini:/var/www/html/config.ini
+      - ./public:/var/www/html/public
+      - ./src:/var/www/html/src
+    restart: always
