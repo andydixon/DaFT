@@ -172,12 +172,20 @@ The output format is determined by the endpoint:
   http://<YOUR_HOST>/<identifier>/prometheus
   ```
 
-### JSON / Telegraf Format
+### JSON Format
 
 Access using:
 
 ```
 http://<YOUR_HOST>/<identifier>
+```
+
+### JSON Format for Telegraf
+
+Access using:
+
+```
+http://<YOUR_HOST>/<identifier>/telegraf
 ```
 
 ### Prometheus/OpenMetrics Format
