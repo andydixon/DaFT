@@ -414,6 +414,176 @@ This ensures **consistent behavior** and prevents API failures due to missing ke
 
 ---
 
+# **Advanced XML Handling in Web & App Handlers**
+
+The `web-xml` and `app-xml` handlers in **Federaliser** provide advanced XML extraction and filtering capabilities, allowing users to:
+
+- Extract **specific paths** from deeply nested XML.
+- Select only **certain fields** from the extracted data.
+- Convert XML to **JSON-like structures** for consistent data handling.
+- Maintain **full backward compatibility** (default behavior is unchanged).
+
+---
+
+## ** How XML Path Extraction Works**
+
+The `xml_path` option allows you to extract **specific parts** of an XML response using **dot notation**.
+
+For example, given this XML response:
+
+```
+<response>
+    <status>success</status>
+    <data>
+        <items>
+            <item>
+                <id>1</id>
+                <name>Alice</name>
+                <score>95</score>
+            </item>
+            <item>
+                <id>2</id>
+                <name>Bob</name>
+                <score>88</score>
+            </item>
+        </items>
+    </data>
+</response>
+```
+
+You can extract **only `<data><items>`** using this configuration:
+
+```
+source = "https://api.example.com/data.xml"
+type = "web-xml"
+xml_path = "data.items.item"
+```
+
+**Returned Output (Converted to JSON-like format):**
+
+```
+[
+    { "id": "1", "name": "Alice", "score": "95" },
+    { "id": "2", "name": "Bob", "score": "88" }
+]
+```
+
+---
+
+## ** Field Filtering: Selecting Only the Data You Need**
+
+The `fields` option allows you to extract only **certain fields** from the extracted data.
+
+For example, with this configuration:
+
+```
+source = "https://api.example.com/data.xml"
+type = "web-xml"
+xml_path = "data.items.item"
+fields = "id,name"
+```
+
+**Returned Output:**
+
+```
+[
+    { "id": "1", "name": "Alice" },
+    { "id": "2", "name": "Bob" }
+]
+```
+
+---
+
+## ** Handling Single XML Elements**
+
+If the extracted `xml_path` points to a **single XML element**, it will be returned as an **object** instead of an array.
+
+**Example XML Response**
+
+```
+<response>
+    <metadata>
+        <info>
+            <version>1.0</version>
+            <author>Admin</author>
+        </info>
+    </metadata>
+</response>
+```
+
+**Configuration**
+
+```
+source = "https://api.example.com/data.xml"
+type = "web-xml"
+xml_path = "metadata.info"
+```
+
+**Returned Output:**
+
+```
+{
+    "version": "1.0",
+    "author": "Admin"
+}
+```
+
+---
+
+## **🛠 Using App XML Handler**
+
+The `app-xml` handler **works exactly the same**, but instead of fetching XML from a web URL, it **runs a shell command** that outputs XML.
+
+**Example Configuration**
+
+```
+source = "/usr/local/bin/my-xml-app --option=value"
+type = "app-xml"
+xml_path = "response.results.item"
+fields = "id,score"
+```
+
+**Expected Output:**
+
+```
+[
+    { "id": "1", "score": "95" },
+    { "id": "2", "score": "88" }
+]
+```
+
+---
+
+## ** What Happens If a Path Doesn’t Exist?**
+
+If the specified `xml_path` does not exist in the response:
+
+- Instead of returning an error, it will **return an empty array (`[]`)**.
+
+If the specified `fields` don’t exist in the extracted data:
+
+- Those fields will **be ignored** without errors.
+
+This ensures **consistent behavior** and prevents API failures due to missing XML elements.
+
+---
+
+## ** Backward Compatibility**
+
+- **If you don’t use `xml_path` or `fields`, the handler works exactly as before.**
+- **No breaking changes for existing users!**
+
+For example, this configuration:
+
+```
+source = "https://api.example.com/data.xml"
+type = "web-xml"
+```
+
+Will still return the **entire XML response** as a **JSON-like array**.
+
+---
+
 ## Extending Federaliser
 
 Federaliser is designed to be extensible. You can add new Data Handlers and Exporters to support additional data sources and output formats.
