@@ -4,7 +4,7 @@ namespace Federaliser;
 class ErrorHandler
 {
 
-    public function handleError($errno, $errstr, $errfile, $errline): void
+    public static function handleError($errno, $errstr, $errfile, $errline): void
     {
         $response = [
             "status" => "CORE_ERROR",
@@ -30,14 +30,14 @@ class ErrorHandler
         echo $jsonOutput;
 
         // Use the injected terminator
-        if (!$this->isRunningUnderPHPUnit()) {
+        if (!self::isRunningUnderPHPUnit()) {
             exit;
         } else {
             echo "(I self identify as terminating here)";
         }
     }
 
-    private function isRunningUnderPHPUnit(): bool
+    private static function isRunningUnderPHPUnit(): bool
 {
     foreach (debug_backtrace() as $trace) {
         if (isset($trace['class']) && strpos($trace['class'], 'PHPUnit\\') === 0) {
