@@ -41,14 +41,14 @@ class Helpers
      * $route = Helpers::cleanUri(true);
      * ```
      * 
-     * @param bool $removePrometheus Optional. If true, removes the `/prometheus` suffix from the URI.
+     * @param bool $removeExporter Optional. If true, removes the `/<exporter>` suffix from the URI.
      * 
      * @return string Cleaned route path.
      */
-    public static function cleanUri(bool $removePrometheus = false): string 
+    public static function cleanUri(bool $removeExporter = false): string
     {
         // Get the REQUEST_URI or default to root
-        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+            $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 
         // Strip any query string (e.g., ?param=value)
         if (($pos = strpos($requestUri, '?')) !== false) {
@@ -58,11 +58,11 @@ class Helpers
         // Trim leading and trailing slashes
         $requestUri = trim($requestUri, '/');
 
-        // Optionally remove the '/prometheus' suffix
-        if ($removePrometheus) {
-            $suffix = 'prometheus';
-            if (str_ends_with($requestUri, $suffix)) {
-                $requestUri = substr($requestUri, 0, -strlen($suffix));
+        // Optionally remove the exporter suffix
+        if ($removeExporter) {
+            $parts = explode("/",$requestUri);
+            if (count($parts)>1) {
+                $requestUri = substr($requestUri, 0, -strlen($parts[count($parts)-1]));
                 $requestUri = rtrim($requestUri, '/');
             }
         }
