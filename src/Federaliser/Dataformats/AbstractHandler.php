@@ -80,7 +80,8 @@ abstract class AbstractHandler implements DataFormatHandlerInterface
      */
     protected function getQueryKeys(): ?array
     {
-        if (isset($this->config['query']) && !empty($this->config['query']) && !$this->isRegexQuery()) {
+        if (!(isset($this->config['type']) && str_contains($this->config['type'],'sql')) &&
+            isset($this->config['query']) && !empty($this->config['query']) && !$this->isRegexQuery()) {
             // Split comma-separated keys and trim whitespace
             return array_map('trim', explode(',', $this->config['query']));
         }
