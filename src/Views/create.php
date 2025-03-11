@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h1>Federaliser::Create</h1>
+    <h1>DaFT::Create</h1>
     <p class="mb-4">
         Fill in the fields below to create a new configuration section. Each field serves a specific purpose depending on the data source or output handler type you choose.
     </p>

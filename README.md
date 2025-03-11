@@ -1,6 +1,6 @@
-# Federaliser
+# DaFT - DAta Federalisation Tool
 
-**Federaliser** is a powerful and flexible data integration tool designed to collect data from multiple sources (MySQL, MSSQL, Redshift/Postgres, Prometheus, JSON, XML, and CSV) and export it in a consistent format. It supports JSON output suitable for Telegraf and text-based output compatible with Prometheus/OpenMetrics.
+**DaFT** is a powerful and flexible data integration tool designed to collect data from multiple sources (MySQL, MSSQL, Redshift/Postgres, Prometheus, JSON, XML, and CSV) and export it in a consistent format. It supports JSON output suitable for Telegraf and text-based output compatible with Prometheus/OpenMetrics.
 
 ---
 
@@ -17,7 +17,7 @@
 7. [Exporter Formats](#exporter-formats)
    - [JSON Exporter](#json-exporter)
    - [Prometheus/OpenMetrics Exporter](#prometheusopenmetrics-exporter)
-8. [Extending Federaliser](#extending-federaliser)
+8. [Extending DaFT](#extending-DaFT)
    - [Adding New Data Handlers](#adding-new-data-handlers)
    - [Creating Custom Exporters](#creating-custom-exporters)
    - [Registering and Using New Components](#registering-and-using-new-components)
@@ -28,7 +28,7 @@
 11. [Configuring Prometheus](#configuring-prometheus)
 12. [Configuring Telegraf](#configuring-telegraf)
 13. [Admin Interface](#admin-interface)
-14. [Using Docker](#using-docker-for-federaliser)
+14. [Using Docker](#using-docker-for-DaFT)
     - [Using in Production](#4-deploying-in-production)
 15. [Troubleshooting](#troubleshooting)
 16. [Contribution and Feedback](#contribution-and-feedback)
@@ -37,7 +37,7 @@
 
 ## Overview
 
-Federaliser ensures that all your data outputs are provided in a consistent format. No matter what your data source or output style is, Federaliser makes it easy to integrate your data with existing monitoring and metrics systems.
+DaFT ensures that all your data outputs are provided in a consistent format. No matter what your data source or output style is, DaFT makes it easy to integrate your data with existing monitoring and metrics systems.
 
 ---
 
@@ -63,7 +63,7 @@ Federaliser ensures that all your data outputs are provided in a consistent form
 
 ## Supported Data Sources and Formats
 
-Federaliser supports a wide variety of data sources and formats, providing flexible integration options.
+DaFT supports a wide variety of data sources and formats, providing flexible integration options.
 
 ### Databases
 
@@ -107,8 +107,8 @@ This modular approach allows you to work seamlessly with a variety of data sourc
 1. **Clone or Download** the repository:
 
    ```bash
-   git clone https://github.com/yourusername/federaliser.git
-   cd federaliser
+   git clone https://github.com/andydixon/DaFT.git
+   cd DaFT
    ```
 
 2. **Install Dependencies**:
@@ -158,7 +158,7 @@ This modular approach allows you to work seamlessly with a variety of data sourc
 
 ## Usage
 
-Access Federaliser via your browser or an HTTP client using:
+Access DaFT via your browser or an HTTP client using:
 
 ```
 http://<YOUR_HOST>/<identifier>
@@ -200,7 +200,7 @@ http://<YOUR_HOST>/<identifier>/prometheus
 
 ## Exporter Formats
 
-Federaliser supports multiple export formats for different use cases.
+DaFT supports multiple export formats for different use cases.
 
 ### JSON Exporter (default)
 
@@ -268,7 +268,7 @@ mysql_metrics{host="server2", status="idle"} 17
 
 ### **Advanced JSON Handling in Web & App Handlers**
 
-The `web-json` and `app-json` handlers in **Federaliser** allow for powerful JSON extraction and filtering, enabling users to:
+The `web-json` and `app-json` handlers in **DaFT** allow for powerful JSON extraction and filtering, enabling users to:
 
 - Extract **specific paths** from deeply nested JSON.
 - Select only **certain fields** from the extracted data.
@@ -424,7 +424,7 @@ This ensures **consistent behavior** and prevents API failures due to missing ke
 
 # **Advanced XML Handling in Web & App Handlers**
 
-The `web-xml` and `app-xml` handlers in **Federaliser** provide advanced XML extraction and filtering capabilities, allowing users to:
+The `web-xml` and `app-xml` handlers in **DaFT** provide advanced XML extraction and filtering capabilities, allowing users to:
 
 - Extract **specific paths** from deeply nested XML.
 - Select only **certain fields** from the extracted data.
@@ -592,9 +592,9 @@ Will still return the **entire XML response** as a **JSON-like array**.
 
 ---
 
-## Extending Federaliser
+## Extending DaFT
 
-Federaliser is designed to be extensible. You can add new Data Handlers and Exporters to support additional data sources and output formats.
+DaFT is designed to be extensible. You can add new Data Handlers and Exporters to support additional data sources and output formats.
 
 ---
 
@@ -604,12 +604,12 @@ Federaliser is designed to be extensible. You can add new Data Handlers and Expo
 
    - Inherit from `AbstractHandler`.
    - Implement the `handle()` method.
-   - Place your class in the `Federaliser\\Dataformats` namespace.
+   - Place your class in the `DaFT\\Dataformats` namespace.
 
    **Example**:
 
    ```php
-   namespace Federaliser\\Dataformats;
+   namespace DaFT\\Dataformats;
 
    class CustomHandler extends AbstractHandler {
        public function handle(): array {
@@ -647,12 +647,12 @@ Federaliser is designed to be extensible. You can add new Data Handlers and Expo
 
    - Extend `AbstractExporter`.
    - Implement the `export()` method.
-   - Place your class in the `Federaliser\\Exporters` namespace.
+   - Place your class in the `DaFT\\Exporters` namespace.
 
    **Example**:
 
    ```php
-   namespace Federaliser\\Exporters;
+   namespace DaFT\\Exporters;
 
    class CustomExporter extends AbstractExporter {
        public static function export($data, $statusCode, $additionalConfig): void {
@@ -740,7 +740,7 @@ systemctl reload prometheus
 
 ## Configuring Telegraf
 
-Create a configuration file (e.g., `federaliser.conf`) in `/etc/telegraf/telegraf.d/` with the following content:
+Create a configuration file (e.g., `DaFT.conf`) in `/etc/telegraf/telegraf.d/` with the following content:
 
 ```toml
 [[inputs.http]]
@@ -761,7 +761,7 @@ systemctl reload telegraf
 
 ## Admin Interface
 
-Federaliser includes an optional **Admin Interface** accessible at `/admin`. This provides full CRUD capabilities for configurations.
+DaFT includes an optional **Admin Interface** accessible at `/admin`. This provides full CRUD capabilities for configurations.
 
 ### Features
 
@@ -776,9 +776,9 @@ Federaliser includes an optional **Admin Interface** accessible at `/admin`. Thi
 
 ---
 
-# Using Docker for Federaliser
+# Using Docker for DaFT
 
-Federaliser can be deployed as a **Docker container** for both **production** and **development** environments. This section provides detailed instructions for building, configuring, and running the Docker image.
+DaFT can be deployed as a **Docker container** for both **production** and **development** environments. This section provides detailed instructions for building, configuring, and running the Docker image.
 
 ---
 
@@ -800,7 +800,7 @@ docker-compose --version
 
 ## Configuration Management
 
-Federaliser uses an **INI configuration file** located within the container:
+DaFT uses an **INI configuration file** located within the container:
 
 ```
 /var/www/html/config.ini
@@ -818,17 +818,17 @@ This file is **mapped from the host to the Docker container**, allowing you to:
 1. **Clone the Repository** (if you haven't already):
 
 ```bash
-git clone https://github.com/your-repo/federaliser.git
-cd federaliser
+git clone https://github.com/your-repo/DaFT.git
+cd DaFT
 ```
 
 2. **Build the Docker Image**:
 
 ```bash
-docker build -t federaliser-app .
+docker build -t DaFT-app .
 ```
 
-- The `-t` flag assigns a name (`federaliser-app`) to the image.
+- The `-t` flag assigns a name (`DaFT-app`) to the image.
 - This builds the image using the `Dockerfile` in the current directory.
 
 ---
@@ -838,7 +838,7 @@ docker build -t federaliser-app .
 In production, the focus is on **performance, security, and scalability**. A prebuilt image can be started with:
 
 ```
-docker run -v /path/to/config.ini:/var/www/html/config.ini nddxn/federaliser
+docker run -v /path/to/config.ini:/var/www/html/config.ini nddxn/DaFT
 ```
 
 Alternatively, a container can be built with the bleeding-edge version:
@@ -848,9 +848,9 @@ Alternatively, a container can be built with the bleeding-edge version:
 ```bash
 docker run -d \
   -p 8080:80 \
-  --name federaliser \
+  --name DaFT \
   -v $(pwd)/config/config.ini:/var/www/html/config.ini \
-  federaliser-app
+  DaFT-app
 ```
 
 ### 2. Configuration:
@@ -868,7 +868,7 @@ version: "3.7"
 
 services:
   app:
-    image: federaliser-app:latest
+    image: DaFT-app:latest
     ports:
       - "80:80"
     volumes:
@@ -897,7 +897,7 @@ docker run -d \
   -e DB_USER="prod_user" \
   -e DB_PASS="securepassword" \
   -p 80:80 \
-  federaliser-app
+  DaFT-app
 ```
 
 ---
@@ -911,11 +911,11 @@ Development mode uses **volume mapping** for hot-reloading and easier debugging.
 ```bash
 docker run -d \
   -p 8080:80 \
-  --name federaliser-dev \
+  --name DaFT-dev \
   -v $(pwd)/config/config.ini:/var/www/html/config.ini \
   -v $(pwd)/src:/var/www/html/src \
   -v $(pwd)/public:/var/www/html/public \
-  federaliser-app
+  DaFT-app
 ```
 
 ### 2. Configuration:
@@ -960,7 +960,7 @@ docker-compose down
 ### 4. Debugging and Accessing the Container:
 
 ```bash
-docker exec -it federaliser-dev bash
+docker exec -it DaFT-dev bash
 ```
 
 ### 5. Install Dependencies:
@@ -968,7 +968,7 @@ docker exec -it federaliser-dev bash
 After starting the container, install dependencies with:
 
 ```bash
-docker exec -it federaliser-dev composer install
+docker exec -it DaFT-dev composer install
 ```
 
 ---
@@ -980,7 +980,7 @@ docker exec -it federaliser-dev composer install
 To view application logs:
 
 ```bash
-docker logs -f federaliser-app
+docker logs -f DaFT-app
 ```
 
 Or with `docker-compose`:
@@ -1021,7 +1021,7 @@ docker-compose exec app composer update
 
 ## Troubleshooting
 
-- **HTTP 500 Errors**: Where Federaliser can, it will give a JSON object with detailed information, otherwise, check the error.log for more information.
+- **HTTP 500 Errors**: Where DaFT can, it will give a JSON object with detailed information, otherwise, check the error.log for more information.
 - Verify that your `config.ini` settings (connection details, credentials, query syntax) are correct.
 - Ensure external data sources are accessible and returning valid data.
 - Use the admin interface to debug and validate configurations.

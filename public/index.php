@@ -2,8 +2,8 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use Federaliser\Application;
-use Federaliser\ErrorHandler;
+use DaFT\Application;
+use DaFT\ErrorHandler;
 
 // Set up the error handler
 set_error_handler([ErrorHandler::class, 'handleError']);

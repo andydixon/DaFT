@@ -1,9 +1,9 @@
 {
-  "name": "andydixon/federaliser",
-  "description": "A data Federaliser application.",
+  "name": "andydixon/daft",
+  "description": "A Data Federation Tool.",
   "autoload": {
     "psr-4": {
-      "Federaliser\\": "src/Federaliser/"
+      "DaFT\\": "src/DaFT/"
     }
   },
   "require": {

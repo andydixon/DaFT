@@ -21,7 +21,7 @@ COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 
 # 4. Copy Application Files and clean-up unneeded files for production
 COPY . /var/www/html
-RUN rm -rf /var/www/html/.git /var/www/html/docker /var/www/html/.github /var/www/html/src/Federaliser/tests
+RUN rm -rf /var/www/html/.git /var/www/html/docker /var/www/html/.github /var/www/html/src/DaFT/tests
 
 # 5. Set Working Directory
 WORKDIR /var/www/html

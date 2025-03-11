@@ -7,7 +7,7 @@
 
     <testsuites>
         <testsuite name="Application Test Suite">
-            <directory suffix="Test.php">src/Federaliser/tests</directory>
+            <directory suffix="Test.php">src/DaFT/tests</directory>
         </testsuite>
     </testsuites>
 

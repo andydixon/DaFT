@@ -1,7 +1,7 @@
 <?php
 
-use Federaliser\Config\ConfigModel;
-use Federaliser\Controller\ConfigController;
+use DaFT\Config\ConfigModel;
+use DaFT\Controller\ConfigController;
 
 require __DIR__ . '/../../vendor/autoload.php';
 

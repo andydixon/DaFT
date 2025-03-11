@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="container mt-5">
-    <h1>Federaliser::Edit</h1>
+    <h1>DaFT::Edit</h1>
     <p class="mb-4">Update the fields below to edit your configuration section.</p>
 
     <?php if (!empty($error)): ?>
