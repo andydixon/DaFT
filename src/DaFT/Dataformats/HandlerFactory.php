@@ -2,6 +2,7 @@
 namespace DaFT\Dataformats;
 
 use InvalidArgumentException;
+use DaFT\Factory\DynamicExtendableFactory;
 
 /**
  * Class HandlerFactory
@@ -12,13 +13,12 @@ use InvalidArgumentException;
  * This factory pattern provides a centralised way to instantiate 
  * different data format handlers, ensuring consistency and scalability.
  * 
- * @todo consolidate code from HandlerFactory and ExporterFactory into a generic Factory class and both extend from that
  *  
  * @author Andy Dixon
  * @created 2025-01-16
  * @namespace DaFT\Dataformats
  */
-class HandlerFactory
+class HandlerFactory extends DynamicExtendableFactory
 {
     /**
      * Create a handler instance based on the 'type' in the configuration.
@@ -39,37 +39,9 @@ class HandlerFactory
      * @return DataFormatHandlerInterface An instance of the appropriate handler, all fallback to the badly named GenericHandler.
      * 
      */
-    public static function create(array $config): DataFormatHandlerInterface
+        public static function create(array $config): DataFormatHandlerInterface
     {
-        $type = self::resolveDataformatHandler($config['type'] ?? 'generic');
+        $type = parent::resolveClass('\\DaFT\\Dataformats\\', 'Handler', 'Generic', $config['type']);
         return new $type($config);
-
-    }
-    /**
-     * Identify if a specific handler exists for the given type.
-     * @param string $type
-     * @return string
-     */
-    private static function resolveDataformatHandler(string $type): string
-    {
-        $type = strtolower($type);
-        // Remove any hyphen and uppercase the immediately following letter
-        $type = preg_replace_callback(
-            '/-(\w)/',
-            fn($m) => strtoupper($m[1]),
-            $type
-        );
-
-        $type = ucfirst($type);
-        $className = $type . 'Handler';
-        $fqcn = '\\Federator\\Dataformats\\' . $className;
-
-        // Check via Composer's autoloader
-        // If the class doesn’t exist, use "GenericHandler"
-        if (!class_exists($fqcn)) {
-            $className = 'GenericHandler';
-        }
-
-        return $className;
     }
 }
