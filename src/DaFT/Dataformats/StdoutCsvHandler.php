@@ -8,7 +8,7 @@ namespace DaFT\Dataformats;
  * normalises the array structure, and optionally filters the data by specified keys.
  * 
  * This class is useful for integrating shell scripts or command-line tools that output CSV data.
- * It inherits common functionality from `AbstractHandler`, such as data normalization and filtering,
+ * It inherits common functionality from `GenericHandler`, such as data normalization and filtering,
  * and uses `CsvParserTrait` for consistent CSV parsing.
  * 
  * Security Notice:
@@ -47,7 +47,7 @@ namespace DaFT\Dataformats;
  * @created 2025-01-16
  * @namespace DaFT\Dataformats
  */
-class StdoutCsvHandler extends AbstractHandler
+class StdoutCsvHandler extends GenericHandler
 {
     use CsvParserTrait;
     

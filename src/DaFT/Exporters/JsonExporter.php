@@ -18,7 +18,7 @@
 
 namespace DaFT\Exporters;
 
-class JsonExporter extends AbstractExporter
+class JsonExporter extends GenericExporter
 {
     /**
      * Exports data as a JSON response.

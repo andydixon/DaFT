@@ -24,6 +24,7 @@ namespace DaFT;
 
 use DaFT\Dataformats\HandlerFactory;
 use DaFT\Exporters\Exporter;
+use DaFT\Exporters\ExporterFactory;
 use DaFT\Helpers;
 
 class Application
@@ -119,23 +120,22 @@ class Application
                     die(json_encode($result));
                 }
 
+                // Identify the exporter, falling back to JSON
+
+                // Get the cleaned request URI using the Helpers class
+                $requestUri = Helpers::cleanUri();
+
+                // Extract the last segment of the URI and convert it to lowercase
+                $format = strtolower(basename($requestUri));
+
+                $exporter = ExporterFactory::create($format);
+
                 // Set exporter options
                 $exporterOptions = ['identifier' => $identifier];
+                
+                // Export from the identified exporter (Defaults to JSON)
+                $exporter::export($result, 200, $exporterOptions);
 
-                // Identify and invoke the appropriate exporter
-                switch (Exporter::identify()) {
-                    case Exporter::PROMETHEUS_EXPORTER:
-                    case Exporter::OPENMETRICS_EXPORTER:
-                        Exporters\OpenmetricsExporter::export($result, 200, $exporterOptions);
-                        break;
-                    case Exporter::TELEGRAF_EXPORTER:
-                        Exporters\TelegrafExporter::export($result, 200, $exporterOptions);
-                        break;
-                    case Exporter::JSON_EXPORTER:
-                    default:
-                        Exporters\JsonExporter::export($result, 200, $exporterOptions);
-                        break;
-                }
             });
         }
     }

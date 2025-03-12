@@ -10,7 +10,7 @@ use PDOException;
  * Executes queries against a Microsoft SQL Server database using PDO with the sqlsrv driver.
  * - This class is designed to handle MSSQL database connections and query execution.
  * - It supports secure database interactions using prepared statements to prevent SQL injection.
- * - It inherits common functionality from `AbstractHandler`, such as data normalization and filtering.
+ * - It inherits common functionality from `GenericHandler`, such as data normalization and filtering.
  * 
  * Security Notice:
  * - To prevent SQL injection, always use parameterised queries or prepared statements.
@@ -51,7 +51,7 @@ use PDOException;
  * @created 2025-01-16
  * @namespace DaFT\Dataformats
  */
-class MssqlHandler extends AbstractHandler
+class MssqlHandler extends GenericHandler
 {
     /**
      * Handles executing the configured query against a Microsoft SQL Server database.

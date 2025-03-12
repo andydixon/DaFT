@@ -594,7 +594,7 @@ Will still return the **entire XML response** as a **JSON-like array**.
 
 ## Extending DaFT
 
-DaFT is designed to be extensible. You can add new Data Handlers and Exporters to support additional data sources and output formats.
+DaFT is designed to be extensible. You can add new Data Handlers and Exporters to support additional data sources and output formats with ease.
 
 ---
 
@@ -602,7 +602,7 @@ DaFT is designed to be extensible. You can add new Data Handlers and Exporters t
 
 1. **Create a New Handler Class**:
 
-   - Inherit from `AbstractHandler`.
+   - Inherit from `GenericHandler`.
    - Implement the `handle()` method.
    - Place your class in the `DaFT\\Dataformats` namespace.
 
@@ -611,7 +611,7 @@ DaFT is designed to be extensible. You can add new Data Handlers and Exporters t
    ```php
    namespace DaFT\\Dataformats;
 
-   class CustomHandler extends AbstractHandler {
+   class CustomHandler extends GenericHandler {
        public function handle(): array {
            // Implement your custom data fetching and processing logic here
            $data = [];
@@ -620,24 +620,11 @@ DaFT is designed to be extensible. You can add new Data Handlers and Exporters t
    }
    ```
 
-2. **Register the Handler** in `HandlerFactory`:
+The naming of the class is important as it defines how the type in the config is parsed. For example:
 
-   - Open `HandlerFactory.php`.
-   - Add a new case for your handler:
-
-   ```php
-   case 'custom-type':
-       return new CustomHandler($config);
-   ```
-
-3. **Configuration**:
-   In your `config.ini`, define the new handler like this:
-   ```ini
-   [example_custom]
-   source       = http://example.com/data
-   type         = custom-type
-   identifier   = custom-metrics
-   ```
+- FooHelper.php will be type = foo
+- FooBarHelper.php will be type = foo-bar
+- FooBarBazHelper.php will be type = foo-bar-baz
 
 ---
 
@@ -645,7 +632,7 @@ DaFT is designed to be extensible. You can add new Data Handlers and Exporters t
 
 1. **Create a New Exporter Class**:
 
-   - Extend `AbstractExporter`.
+   - Extend `GenericExporter`.
    - Implement the `export()` method.
    - Place your class in the `DaFT\\Exporters` namespace.
 
@@ -654,7 +641,7 @@ DaFT is designed to be extensible. You can add new Data Handlers and Exporters t
    ```php
    namespace DaFT\\Exporters;
 
-   class CustomExporter extends AbstractExporter {
+   class CustomExporter extends GenericExporter {
        public static function export($data, $statusCode, $additionalConfig): void {
            header('Content-Type: application/custom-format');
            echo custom_format_encode($data);
@@ -662,26 +649,11 @@ DaFT is designed to be extensible. You can add new Data Handlers and Exporters t
    }
    ```
 
-2. **Register the Exporter**:
+   The naming of the class is important as it defines how the exporter in the URI is parsed. For example:
 
-   - Update `Exporter::identify()` to recognise your new exporter type.
-   - Add routing logic in `Application` to handle the new export format.
-
-3. **Accessing the New Exporter**:
-   In your browser:
-   ```
-   http://<YOUR_HOST>/<identifier>/custom-format
-   ```
-
----
-
-### Registering and Using New Components
-
-- **Update `HandlerFactory`** to include the new handler type and class.
-- **Update `Exporter::identify()`** for new exporters.
-- **Add routing** for the new exporter type in `Application`.
-
-This ensures the new components are properly integrated and accessible via HTTP endpoints.
+- FooExporter.php will be /foo
+- FooBarExporter.php will be /foo-bar
+- FooBarBazExporter.php will be /foo-bar-baz
 
 ---
 

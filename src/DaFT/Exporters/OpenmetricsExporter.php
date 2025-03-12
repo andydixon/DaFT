@@ -12,7 +12,7 @@
 
 namespace DaFT\Exporters;
 
-class OpenmetricsExporter extends AbstractExporter {
+class OpenmetricsExporter extends GenericExporter {
 
     /**
      * Outputs data in OpenMetrics format with labels and metric values.

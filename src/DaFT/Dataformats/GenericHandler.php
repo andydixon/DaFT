@@ -2,7 +2,7 @@
 namespace DaFT\Dataformats;
 
 /**
- * Class AbstractHandler
+ * Class GenericHandler
  * 
  * Provides common functionality for data handlers including:
  * - Normalizing arrays to ensure a consistent multidimensional structure.
@@ -14,7 +14,7 @@ namespace DaFT\Dataformats;
  * 
  * Usage Example (in a child class):
  * ```
- * class ExampleHandler extends AbstractHandler {
+ * class ExampleHandler extends GenericHandler {
  *     public function handle() {
  *         $data = [
  *             ['id' => 1, 'name' => 'Alice', 'email' => 'alice@example.com'],
@@ -34,7 +34,7 @@ namespace DaFT\Dataformats;
  * @created 2025-01-16
  * @namespace DaFT\Dataformats
  */
-abstract class AbstractHandler implements DataFormatHandlerInterface
+abstract class GenericHandler implements DataFormatHandlerInterface
 {
     /**
      * @var array Configuration array with keys such as 'source', 'type', 'query', etc.

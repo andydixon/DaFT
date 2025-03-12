@@ -1,5 +1,5 @@
 <?php
-namespace DaFT\Dataformats;
+namespace DaFT\Exporters;
 
 use InvalidArgumentException;
 
@@ -11,14 +11,12 @@ use InvalidArgumentException;
  * 
  * This factory pattern provides a centralised way to instantiate 
  * different data format handlers, ensuring consistency and scalability.
- * 
- * @todo consolidate code from HandlerFactory and ExporterFactory into a generic Factory class and both extend from that
  *  
  * @author Andy Dixon
  * @created 2025-01-16
  * @namespace DaFT\Dataformats
  */
-class HandlerFactory
+class ExporterFactory
 {
     /**
      * Create a handler instance based on the 'type' in the configuration.
@@ -34,23 +32,25 @@ class HandlerFactory
      * unlike previous implementations where the handler was instantiated directly from
      * a switch statement.
      * 
+     * @todo consolidate code from HandlerFactory and ExporterFactory into a generic Factory class and both extend from that
+     * 
      * @param array $config Configuration array containing at least a 'type' key.
      * 
-     * @return DataFormatHandlerInterface An instance of the appropriate handler, all fallback to the badly named GenericHandler.
+     * @return Exporter An instance of the appropriate handler, all fallback to the badly named JsonExporter.
      * 
      */
-    public static function create(array $config): DataFormatHandlerInterface
+    public static function create(string $exporter='JSON'): GenericExporter
     {
-        $type = self::resolveDataformatHandler($config['type'] ?? 'generic');
-        return new $type($config);
+        $type = self::resolveExporter($config['type'] ?? 'Json');
+        return new $type($exporter);
 
     }
     /**
      * Identify if a specific handler exists for the given type.
-     * @param string $type
+     * @param string $type 
      * @return string
      */
-    private static function resolveDataformatHandler(string $type): string
+    private static function resolveExporter(string $type): string
     {
         $type = strtolower($type);
         // Remove any hyphen and uppercase the immediately following letter
@@ -61,13 +61,13 @@ class HandlerFactory
         );
 
         $type = ucfirst($type);
-        $className = $type . 'Handler';
-        $fqcn = '\\Federator\\Dataformats\\' . $className;
+        $className = $type . 'Exporter';
+        $fqcn = '\\Federator\\Exporters\\' . $className;
 
         // Check via Composer's autoloader
-        // If the class doesn’t exist, use "GenericHandler"
+        // If the class doesn’t exist, use "JsonExporter"
         if (!class_exists($fqcn)) {
-            $className = 'GenericHandler';
+            $className = 'JsonExporter';
         }
 
         return $className;

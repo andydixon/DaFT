@@ -8,7 +8,7 @@ namespace DaFT\Dataformats;
  * normalises the array structure, and optionally filters the data by specified keys.
  * 
  * This class is useful for integrating local XML data sources.
- * It inherits common functionality from `AbstractHandler`, such as data normalization and filtering.
+ * It inherits common functionality from `GenericHandler`, such as data normalization and filtering.
  * 
  * Security Notice:
  * - This class only reads local files and validates paths to prevent directory traversal attacks.
@@ -42,7 +42,7 @@ namespace DaFT\Dataformats;
  * @created 2025-01-16
  * @namespace DaFT\Dataformats
  */
-class FileXmlHandler extends AbstractHandler
+class FileXmlHandler extends GenericHandler
 {
     /**
      * Handles reading the XML data from a local file and processing it.

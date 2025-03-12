@@ -10,7 +10,7 @@ namespace DaFT\Dataformats;
  * - Normalises the array structure and optionally filters the data by specified keys.
  * 
  * This class is useful for processing CSV data from local files.
- * It inherits common functionality from `AbstractHandler`, such as array normalization and data filtering,
+ * It inherits common functionality from `GenericHandler`, such as array normalization and data filtering,
  * and uses `CsvParserTrait` for consistent CSV parsing.
  * 
  * Security Notice:
@@ -44,7 +44,7 @@ namespace DaFT\Dataformats;
  * @created 2025-01-16
  * @namespace DaFT\Dataformats
  */
-class FileCsvHandler extends AbstractHandler
+class FileCsvHandler extends GenericHandler
 {
     use CsvParserTrait;
     

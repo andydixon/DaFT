@@ -10,7 +10,7 @@ use RuntimeException;
  * Converts multidimensional arrays into a single JSON object suitable for Telegraf.
  * The first column becomes the key, and the second column becomes the value.
  */
-class TelegrafExporter extends AbstractExporter
+class TelegrafExporter extends GenericExporter
 {
     /**
      * Outputs a Telegraf-compatible JSON response.

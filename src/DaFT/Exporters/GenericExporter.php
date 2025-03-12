@@ -1,6 +1,6 @@
 <?php
 /**
- * AbstractExporter Class for Prometheus Exporters
+ * GenericExporter Class for Prometheus Exporters
  * 
  * This class serves as a base class for all exporters in the application. 
  * Although not technically abstract, it acts as a catch-all implementation that provides shared functionality.
@@ -18,10 +18,10 @@
 
 namespace DaFT\Exporters;
 
-class AbstractExporter 
+class GenericExporter 
 {
     /**
-     * Exports data in a Prometheus-compatible format.
+     * Generic class everything is built from.
      * 
      * This method is a placeholder and is meant to be overridden by child classes.
      * If an exporter class does not implement its own `export()` method, this method will be called.
@@ -31,7 +31,7 @@ class AbstractExporter
      * 
      * Example Usage:
      * ```
-     * AbstractExporter::export($data, 200, $config);
+     * GenericExporter::export($data, 200, $config);
      * ```
      * 
      * @param array $data            The data to be exported. Expected to be an associative array.

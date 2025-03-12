@@ -12,14 +12,14 @@ use PDOException;
  * 
  * ⚠️ DEPRECATED:
  * This class is deprecated and should no longer be used for new implementations.
- * Consider using the unified `AbstractHandler` class or other relevant alternatives.
+ * Consider using the unified `GenericHandler` class or other relevant alternatives.
  * 
  * Reason for Deprecation:
  * - This class was tied to legacy database structures and does not support newer data formats.
  * - It was silly to have two different abstract classes for the \DaFT\Dataformats namespace.
  * 
  * Suggested Alternative:
- * - Use `AbstractHandler` for newer database interactions.
+ * - Use `GenericHandler` for newer database interactions.
  * 
  * @deprecated This class is deprecated and will be removed in future releases.
  *             Consider using `DatabaseQueryHandler` or other modern alternatives.

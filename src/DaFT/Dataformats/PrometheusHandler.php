@@ -7,7 +7,7 @@ namespace DaFT\Dataformats;
  * Executes queries against a Prometheus server via a cURL call.
  * - This class is designed to query a Prometheus server's HTTP API and retrieve metrics.
  * - It supports customizable queries and handles JSON responses.
- * - It inherits common functionality from `AbstractHandler`, such as data normalization and filtering.
+ * - It inherits common functionality from `GenericHandler`, such as data normalization and filtering.
  * 
  * Security Notice:
  * - Ensure that the Prometheus endpoint is secured to prevent unauthorised access.
@@ -50,7 +50,7 @@ namespace DaFT\Dataformats;
  * @created 2025-01-16
  * @namespace DaFT\Dataformats
  */
-class PrometheusHandler extends AbstractHandler
+class PrometheusHandler extends GenericHandler
 {
     /**
      * Handles executing the configured query against a Prometheus server.

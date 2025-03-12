@@ -12,7 +12,7 @@ namespace DaFT\Dataformats;
  * 
  * Any JSON-based handlers (e.g., WebJsonHandler, AppJsonHandler) should extend this class.
  */
-abstract class AbstractJsonHandler extends AbstractHandler
+abstract class AbstractJsonHandler extends GenericHandler
 {
     /**
      * Extracts a nested JSON path using dot notation.

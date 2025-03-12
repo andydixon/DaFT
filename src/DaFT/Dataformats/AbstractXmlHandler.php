@@ -7,7 +7,7 @@ namespace DaFT\Dataformats;
  *
  * Provides shared XML extraction and filtering logic for WebXmlHandler and AppXmlHandler.
  */
-abstract class AbstractXmlHandler extends AbstractHandler
+abstract class AbstractXmlHandler extends GenericHandler
 {
     /**
      * Parses XML into an associative array.

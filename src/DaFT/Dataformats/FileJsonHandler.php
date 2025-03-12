@@ -13,7 +13,7 @@ namespace DaFT\Dataformats;
  * 
  * @namespace DaFT\Dataformats
  */
-class FileJsonHandler extends AbstractHandler
+class FileJsonHandler extends GenericHandler
 {
     public function handle(): array
     {

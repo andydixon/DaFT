@@ -8,7 +8,7 @@ namespace DaFT\Dataformats;
  * normalises the array structure, and optionally filters the data by specified keys.
  * 
  * This class is useful for integrating remote CSV data sources accessible via HTTP or HTTPS.
- * It inherits common functionality from `AbstractHandler`, such as data normalization and filtering,
+ * It inherits common functionality from `GenericHandler`, such as data normalization and filtering,
  * and uses `CsvParserTrait` for consistent CSV parsing.
  * 
  * Security Notice:
@@ -48,7 +48,7 @@ namespace DaFT\Dataformats;
  * @created 2025-01-16
  * @namespace DaFT\Dataformats
  */
-class WebCsvHandler extends AbstractHandler
+class WebCsvHandler extends GenericHandler
 {
     use CsvParserTrait;
     

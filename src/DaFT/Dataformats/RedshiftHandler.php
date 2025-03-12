@@ -10,7 +10,7 @@ use PDOException;
  * Executes queries against an Amazon Redshift cluster using the PostgreSQL PDO driver.
  * - This class is designed to handle Redshift database connections and query execution.
  * - It supports secure database interactions using prepared statements to prevent SQL injection.
- * - It inherits common functionality from `AbstractHandler`, such as data normalization and filtering.
+ * - It inherits common functionality from `GenericHandler`, such as data normalization and filtering.
  * 
  * Security Notice:
  * - To prevent SQL injection, always use parameterised queries or prepared statements.
@@ -52,7 +52,7 @@ use PDOException;
  * @created 2025-01-16
  * @namespace DaFT\Dataformats
  */
-class RedshiftHandler extends AbstractHandler
+class RedshiftHandler extends GenericHandler
 {
     /**
      * Handles executing the configured query against an Amazon Redshift cluster.

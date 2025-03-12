@@ -8,7 +8,7 @@ namespace DaFT\Dataformats;
  * - If a `query` is set, it is assumed to be a regex pattern with named capturing groups.
  * - If no `query` is set, the raw output is returned as a single-element array.
  * - This class supports complex text parsing scenarios using regex patterns.
- * - It inherits common functionality from `AbstractHandler`, such as data normalization and filtering.
+ * - It inherits common functionality from `GenericHandler`, such as data normalization and filtering.
  * 
  * Security Notice:
  * - The command specified in `source` is executed using `shell_exec()`.
@@ -46,7 +46,7 @@ namespace DaFT\Dataformats;
  * @created 2025-01-16
  * @namespace DaFT\Dataformats
  */
-class StdoutHandler extends AbstractHandler
+class StdoutHandler extends GenericHandler
 {
     /**
      * Handles executing the configured command and processing its STDOUT.
