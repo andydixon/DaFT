@@ -103,7 +103,7 @@ class MssqlHandler extends GenericHandler
         $dbName = $this->config['default_db'] ?? '';
         $user   = $this->config['username'] ?? '';
         $pass   = $this->config['password'] ?? '';
-        $sql    = $this->config['query'] ?? '';
+        $sql    = parent::parseSQL($this->config['query'] ?? '');
         $params = $this->config['params'] ?? [];
 
         try {

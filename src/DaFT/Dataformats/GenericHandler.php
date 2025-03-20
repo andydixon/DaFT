@@ -184,4 +184,30 @@ abstract class GenericHandler implements DataFormatHandlerInterface
         }
         return $filtered;
     }
+
+    /**
+     * If the SQL query starts with << then get the SQL from the file, otherwise return the SQL as is.
+     * @param string $sql
+     * @return string
+     */
+    protected function parseSQL(string $sql): string {
+         // Check if the input starts with <<
+    if (substr($sql, 0, 2) === '<<') {
+        // Extract the path by removing the prefix <<
+        $filePath = substr($sql, 2);
+        
+        // Check if the file exists and is readable
+        if (file_exists($filePath) && is_readable($filePath)) {
+            // Get the content of the file
+            return file_get_contents($filePath);
+        } else {
+            // Handle the case where the file does not exist or is not readable
+            return "SELECT 'Error: File does not exist or is not readable.' AS Error";
+        }
+    } else {
+        // Return the original string if there is no prefix
+        return $sql;
+    }
+
+    }
 }
