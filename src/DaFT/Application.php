@@ -125,10 +125,12 @@ class Application
                 // Get the cleaned request URI using the Helpers class
                 $requestUri = Helpers::cleanUri();
 
+                $uriParts = Helpers::processURIParts($requestUri);
+
                 // Extract the last segment of the URI and convert it to lowercase
                 $format = strtolower(basename($requestUri));
 
-                $exporter = ExporterFactory::create($format);
+                $exporter = ExporterFactory::create($format['exporter']);
 
                 // Set exporter options
                 $exporterOptions = ['identifier' => $identifier];

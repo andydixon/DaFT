@@ -70,6 +70,31 @@ class Helpers
         return $requestUri;
     }
 
+    /**
+     * Slit URI into useful part
+     * @param mixed $uri
+     * @return array{numParts: int, secondPart: string}
+     */
+    public static function processURIParts($uri) {
+    // Trim leading and trailing slashes
+    $trimmedUri = trim($uri, '/');
+    
+    // Split the URI into parts
+    $parts = explode('/', $trimmedUri);
+    
+    // Count the number of parts
+    $numParts = count($parts);
+    
+    // Determine the value of the variable based on the number of parts
+    $secondPart = ($numParts === 2) ? $parts[1] : "json";
+
+    // Return the number of parts and the determined value
+    return [
+        'identifier' => $numParts,
+        'exporter' => $secondPart
+    ];
+}
+
     public static function arrayFlatten(array $array): array
     {
         $result = [];
