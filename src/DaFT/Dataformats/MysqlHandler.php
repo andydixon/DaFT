@@ -3,25 +3,27 @@ namespace DaFT\Dataformats;
 
 use PDO;
 use PDOException;
+use DaFT\Logger;
+
 
 /**
  * Class MysqlHandler
- * 
+ *
  * Executes queries against a MySQL database using PDO.
  * - This class is designed to handle MySQL database connections and query execution.
  * - It supports secure database interactions using prepared statements to prevent SQL injection.
  * - It inherits common functionality from `GenericHandler`, such as data normalization and filtering.
- * 
+ *
  * Security Notice:
  * - To prevent SQL injection, always use parameterised queries or prepared statements.
  * - This class safely binds query parameters using PDO's built-in functionality.
- * 
+ *
  * Usage Example:
  * ```
  * $config = [
  *     'type' => 'mysql',
  *     'source' => 'localhost',
- *     'port' => 3306,
+ *     'port' => 3306,›
  *     'default_db' => 'example_db',
  *     'username' => 'root',
  *     'password' => 'password',
@@ -30,11 +32,11 @@ use PDOException;
  *         'status' => 'active'
  *     ]
  * ];
- * 
+ *
  * $handler = new MysqlHandler($config);
  * $result = $handler->handle();
  * ```
- * 
+ *
  * Example Output:
  * ```
  * [
@@ -42,11 +44,11 @@ use PDOException;
  *     ['id' => 2, 'name' => 'Bob', 'email' => 'bob@example.com']
  * ]
  * ```
- * 
+ *
  * Design Considerations:
  * - This class promotes secure database access using prepared statements.
  * - It handles database errors gracefully and provides meaningful error messages for debugging.
- * 
+ *
  * @author Andy Dixon
  * @created 2025-01-16
  * @namespace DaFT\Dataformats
@@ -55,14 +57,14 @@ class MysqlHandler extends GenericHandler
 {
     /**
      * Handles executing the configured query against a MySQL database.
-     * 
+     *
      * This method:
      * - Establishes a PDO connection using the `mysql` driver.
      * - Uses prepared statements to securely execute the query.
      * - Fetches the results as an associative array.
      * - Normalises the array structure and optionally filters the data by query keys.
      * - Handles and logs database connection and query errors gracefully.
-     * 
+     *
      * Example:
      * ```
      * $config = [
@@ -77,22 +79,22 @@ class MysqlHandler extends GenericHandler
      *         'status' => 'active'
      *     ]
      * ];
-     * 
+     *
      * $handler = new MysqlHandler($config);
      * $result = $handler->handle();
      * ```
-     * 
+     *
      * Error Handling:
      * - Throws `RuntimeException` if the database connection fails.
      * - Catches `PDOException` and returns an error message with the query.
      * - Uses `PDO::ERRMODE_EXCEPTION` to catch and handle database errors gracefully.
-     * 
+     *
      * Security Note:
      * - Uses prepared statements with bound parameters to prevent SQL injection attacks.
      * - Ensure that user input is sanitised before passing it as query parameters.
-     * 
+     *
      * @return array Query results as an associative array or error details.
-     * 
+     *
      * @throws \RuntimeException If the database connection fails.
      */
     public function handle(): array
@@ -109,7 +111,7 @@ class MysqlHandler extends GenericHandler
         try {
             // Build the Data Source Name (DSN) for the MySQL driver
             $dsn = "mysql:host={$host};port={$port};dbname={$dbName};charset=utf8mb4";
-            
+
             // Establish a PDO connection with error handling mode
             $pdo = new PDO($dsn, $user, $pass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -123,6 +125,10 @@ class MysqlHandler extends GenericHandler
             // Fetch all results as an associative array
             $data = $stmt->fetchAll();
 
+            if(count($data)==0) {
+                Logger::logGeneric("zeroRecordsReturned","WARN","Zero data returned for identifier '".$this->config['identifier']."'");
+            }
+
             // Normalise the array structure
             $data = $this->normaliseArray($data);
 
@@ -130,7 +136,7 @@ class MysqlHandler extends GenericHandler
             return $this->filterData($data);
 
         } catch (PDOException $ex) {
-            // Return error details for debugging (consider logging in production)
+            Logger::logPDOException($ex, $sql, $params);
             return [
                 'error' => $ex->getMessage(),
                 'query' => $sql,
