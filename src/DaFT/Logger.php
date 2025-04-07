@@ -4,6 +4,7 @@ namespace DaFT;
 
 use PDOException;
 use DateTime;
+use DaFT\LogAlerting;
 
 class Logger
 {
@@ -24,6 +25,7 @@ class Logger
             "Line: " . $exception->getLine() . "\n" .
             "Query: " . ($query ?: 'N/A') . "\n" .
             "Params: " . self::formatParams($params) . "\n\n";
+        // LogAlerting::sendAlert($logMessage);
 
         // Write to the log file
         file_put_contents($logFileName, $logMessage, FILE_APPEND);
@@ -42,10 +44,10 @@ class Logger
 
         // Prepare the log message
         $logMessage = "[" . $date->format('Y-m-d H:i:s') . "] " .
-            strtoupper($alertLevel) . " - " . $message . "\n---\n\n";
-
+            strtoupper($alertLevel) . " - " . $message ;
+        LogAlerting::sendAlert($logMessage);
         // Write to the log file
-        file_put_contents($logFileName, $logMessage, FILE_APPEND);
+        file_put_contents($logFileName, $logMessage. "\n---\n\n", FILE_APPEND);
     }
 
     // Helper function to format the parameters array

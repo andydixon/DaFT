@@ -5,98 +5,10 @@ use PDO;
 use PDOException;
 use DaFT\Logger;
 
-
-/**
- * Class MysqlHandler
- *
- * Executes queries against a MySQL database using PDO.
- * - This class is designed to handle MySQL database connections and query execution.
- * - It supports secure database interactions using prepared statements to prevent SQL injection.
- * - It inherits common functionality from `GenericHandler`, such as data normalization and filtering.
- *
- * Security Notice:
- * - To prevent SQL injection, always use parameterised queries or prepared statements.
- * - This class safely binds query parameters using PDO's built-in functionality.
- *
- * Usage Example:
- * ```
- * $config = [
- *     'type' => 'mysql',
- *     'source' => 'localhost',
- *     'port' => 3306,›
- *     'default_db' => 'example_db',
- *     'username' => 'root',
- *     'password' => 'password',
- *     'query' => 'SELECT * FROM users WHERE status = :status',
- *     'params' => [
- *         'status' => 'active'
- *     ]
- * ];
- *
- * $handler = new MysqlHandler($config);
- * $result = $handler->handle();
- * ```
- *
- * Example Output:
- * ```
- * [
- *     ['id' => 1, 'name' => 'Alice', 'email' => 'alice@example.com'],
- *     ['id' => 2, 'name' => 'Bob', 'email' => 'bob@example.com']
- * ]
- * ```
- *
- * Design Considerations:
- * - This class promotes secure database access using prepared statements.
- * - It handles database errors gracefully and provides meaningful error messages for debugging.
- *
- * @author Andy Dixon
- * @created 2025-01-16
- * @namespace DaFT\Dataformats
- */
 class MysqlHandler extends GenericHandler
 {
-    /**
-     * Handles executing the configured query against a MySQL database.
-     *
-     * This method:
-     * - Establishes a PDO connection using the `mysql` driver.
-     * - Uses prepared statements to securely execute the query.
-     * - Fetches the results as an associative array.
-     * - Normalises the array structure and optionally filters the data by query keys.
-     * - Handles and logs database connection and query errors gracefully.
-     *
-     * Example:
-     * ```
-     * $config = [
-     *     'type' => 'mysql',
-     *     'source' => 'localhost',
-     *     'port' => 3306,
-     *     'default_db' => 'example_db',
-     *     'username' => 'root',
-     *     'password' => 'password',
-     *     'query' => 'SELECT * FROM users WHERE status = :status',
-     *     'params' => [
-     *         'status' => 'active'
-     *     ]
-     * ];
-     *
-     * $handler = new MysqlHandler($config);
-     * $result = $handler->handle();
-     * ```
-     *
-     * Error Handling:
-     * - Throws `RuntimeException` if the database connection fails.
-     * - Catches `PDOException` and returns an error message with the query.
-     * - Uses `PDO::ERRMODE_EXCEPTION` to catch and handle database errors gracefully.
-     *
-     * Security Note:
-     * - Uses prepared statements with bound parameters to prevent SQL injection attacks.
-     * - Ensure that user input is sanitised before passing it as query parameters.
-     *
-     * @return array Query results as an associative array or error details.
-     *
-     * @throws \RuntimeException If the database connection fails.
-     */
+    protected $lockfileDir = '/tmp/mysql_replication_locks'; // Directory to store lockfiles
+
     public function handle(): array
     {
         // Retrieve connection details from configuration
@@ -107,6 +19,11 @@ class MysqlHandler extends GenericHandler
         $pass   = $this->config['password'] ?? '';
         $sql    = parent::parseSQL($this->config['query'] ?? '');
         $params = $this->config['params'] ?? [];
+        $replicaCheck = $this->config['checkReplication'] ?? false;
+        $alertingTolerance = (int)($this->config['alertTolerance'] ?? 1);
+        $identifier = $this->config['identifier'] ?? 'default';
+        $silenced = false;
+        $newLock = false;
 
         try {
             // Build the Data Source Name (DSN) for the MySQL driver
@@ -118,15 +35,66 @@ class MysqlHandler extends GenericHandler
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
             ]);
 
-            // Prepare and execute the query using prepared statements
+            // Check replication status first
+            if ($replicaCheck) {
+                $replicationStatus = $pdo->query("SHOW SLAVE STATUS")->fetch();
+
+                // Ensure lockfile directory exists
+                if (!is_dir($this->lockfileDir)) {
+                    mkdir($this->lockfileDir, 0755, true);
+                }
+
+                $lockfile = "{$this->lockfileDir}/replication_alert_{$host}.lock";
+
+                // Replication lag check logic
+                if ($replicationStatus && isset($replicationStatus['Seconds_Behind_Master'])) {
+                    $lag = (int)$replicationStatus['Seconds_Behind_Master'];
+
+                    if ($lag >= 60) {
+                        $silenced = true;
+                        // If lockfile doesn't exist or is older than 15 mins, create/update it and log
+                        if (!file_exists($lockfile) || (time() - filemtime($lockfile)) > 900) {
+                            touch($lockfile);
+                            $newLock = true;
+                            Logger::logGeneric("replicationLagAlert", "ERROR", "Replication lag on {$host}: {$lag} seconds behind master. Data may be inconsistent.");
+                        }
+                    } else {
+                        // If replication has caught up, remove lockfile and log
+                        if (file_exists($lockfile)) {
+                            unlink($lockfile);
+                            Logger::logGeneric("replicationRecovered", "INFO", "Replication on {$host} has caught up ({$lag} seconds behind master). Lockfile removed.");
+                        }
+                    }
+                }
+            } // End of replica checking code
+
+            // Prepare and execute the main query using prepared statements
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
 
             // Fetch all results as an associative array
             $data = $stmt->fetchAll();
 
-            if(count($data)==0) {
-                Logger::logGeneric("zeroRecordsReturned","WARN","Zero data returned for identifier '".$this->config['identifier']."'");
+            // Alerting tolerance logic
+            $toleranceLockfile = "{$this->lockfileDir}/zero_records_{$identifier}.lock";
+
+            if (count($data) == 0) {
+                $failureCount = file_exists($toleranceLockfile) ? (int)file_get_contents($toleranceLockfile) : 0;
+                $failureCount++;
+
+                if ($failureCount > $alertingTolerance) {
+                    Logger::logGeneric("zeroRecordsReturned", "WARN", "Zero data returned for identifier '{$identifier}' after {$failureCount} attempts.");
+                    if (file_exists($toleranceLockfile)) {
+                        unlink($toleranceLockfile);
+                    }
+                } else {
+                    file_put_contents($toleranceLockfile, $failureCount);
+                }
+            } else {
+                // Remove tolerance lockfile if data is now available
+                if (file_exists($toleranceLockfile)) {
+                    unlink($toleranceLockfile);
+                }
             }
 
             // Normalise the array structure
@@ -140,7 +108,7 @@ class MysqlHandler extends GenericHandler
             return [
                 'error' => $ex->getMessage(),
                 'query' => $sql,
-                'params' => $params
+                'params' => $this->config
             ];
         }
     }
