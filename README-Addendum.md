@@ -2,9 +2,8 @@
 
 ## Prometheus Exporter
 
-If the data passed to the exporter has a field called `__backfill` it will set that as a unix timestamp to backfill data. Either a Unix timestamp or a MySQL timestamp (YYYY-mm-dd HH;ii:ss) are accepted. Will default to the current unix timestamp if something breaks. If using datasources that need fields specified (eg json,xml), __backfill needs to be added to the list.
+If the data passed to the exporter has a field called `__backfill` it will set that as a unix timestamp to backfill data. Either a Unix timestamp or a MySQL timestamp (YYYY-mm-dd HH;ii:ss) are accepted. Will default to the current unix timestamp if something breaks. If using datasources that need fields specified (eg json,xml), \_\_backfill needs to be added to the list.
 @change: Specify field to be the backfill field in config.ini
-
 
 ## Database Helpers
 
@@ -13,7 +12,6 @@ If the `query` is prefixed with <<, then it will convert the rest of the string 
 ```inifile
 query = <</shared/sql/dataSnapshotQuery.sql
 ```
-
 
 ## Helpers
 
@@ -33,11 +31,12 @@ Will alert to that specific webex space. Need to add other methods.
 ## Replication check
 
 If this is set:
+
 ```
 checkReplication=true
 ```
-Then replication is checked, and if a slave is >60s out of sync, it will report the issue. If there are no records, then it will report it once, and mute itself until replication is sorted, or data is returned.
 
+Then replication is checked, and if a slave is >60s out of sync, it will report the issue. If there are no records, then it will report it once, and mute itself until replication is sorted, or data is returned.
 
 ## Alerting Tolerances
 
@@ -45,8 +44,21 @@ Then replication is checked, and if a slave is >60s out of sync, it will report 
 
 If the following value is specified:
 
-```
+````
 alertTolerance=10
 ``
 
 Then, there are no alerts raised until the 11th scrape returns back no information. If a scrape during that time occurs, then the counter is reset.
+
+
+
+## InfluxDB scraper
+
+```inifile
+type   = influx
+source = http://localhost
+port   = 8086
+db     = mydatabase
+query  = SELECT * FROM measurement LIMIT 1
+etc...
+````

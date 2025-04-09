@@ -5,7 +5,7 @@ use DaFT\Logger;
 use RuntimeException;
 
 /**
- * Class AthenaHandler
+ * Class AthenaHandler              ***UNTESTED***
  * 
  * Executes queries against an AWS Athena database using the ODBC driver.
  * - Reads AWS credentials from config and sets environment variables for ODBC driver.
@@ -14,7 +14,7 @@ use RuntimeException;
  * Security Notice:
  * - Athena ODBC requires environment variables for AWS authentication.
  * - This class automatically sets AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY from config.
- * - Ensure AWS credentials are stored securely.
+ * - Ensure AWS credentials are stored securely. IAM roles are recommended for production use if hosting on AWS.
  * 
  * @namespace DaFT\Dataformats
  */
@@ -55,14 +55,6 @@ class AthenaHandler extends GenericHandler
             $conn = odbc_connect($connStr, '', '');
             if (!$conn) {
                 throw new RuntimeException('Failed to connect to Athena ODBC: ' . odbc_errormsg());
-            }
-
-            // Prepare the query (manual interpolation as ODBC doesn't support bound parameters)
-            if (!empty($params)) {
-                foreach ($params as $param) {
-                    $safeParam = is_numeric($param) ? $param : "'" . str_replace("'", "''", $param) . "'";
-                    $sql = preg_replace('/\?/', $safeParam, $sql, 1);
-                }
             }
 
             $result = odbc_exec($conn, $sql);
