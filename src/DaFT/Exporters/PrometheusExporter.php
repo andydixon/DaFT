@@ -28,6 +28,10 @@ class PrometheusExporter extends GenericExporter {
 
         // Set the identifier or default to 'metric'
         $identifier = isset($additionalConfig['identifier']) ? $additionalConfig['identifier'] : 'metric';
+        if(isset($additionalConfig['config']['group'])) $identifier= $additionalConfig['config']['group'];
+
+        $backfillMultiplier = $additionalConfig['config']['backfill_multiplier'] ?? 1;
+
         $headerHandler("Content-Type: text/plain");
 
         foreach ($data as $row) {
@@ -49,13 +53,13 @@ class PrometheusExporter extends GenericExporter {
                 // Check if the content is a MySQL timestamp
                 if (strtotime($backfillValue) !== false && preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $backfillValue)) {
                     // Convert MySQL timestamp to Unix timestamp
-                    $suffix = " ".strval(strtotime($backfillValue));
+                    $suffix = " ".strval(strtotime($backfillValue)*$backfillMultiplier);
                 } elseif (is_numeric($backfillValue) && (int)$backfillValue == $backfillValue && $backfillValue<= time()) {
                     // If it's already a Unix timestamp in the past, leave it as is
-                    $suffix = " ".strval($backfillValue);
+                    $suffix = " ".strval($backfillValue*$backfillMultiplier);
                 } else {
                     // If neither, set it to the current Unix timestamp
-                    $suffix = " ".strval(time());
+                    $suffix = " ".strval(time()*$backfillMultiplier);
                 }
             }
 
