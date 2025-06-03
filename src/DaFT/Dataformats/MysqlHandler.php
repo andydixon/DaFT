@@ -7,7 +7,7 @@ use DaFT\Logger;
 
 class MysqlHandler extends GenericHandler
 {
-    protected $lockfileDir = '/tmp/mysql_replication_locks'; // Directory to store lockfiles
+    protected $lockfileDir = __DIR__.'/../../../mysql_replication_locks'; // Directory to store lockfiles
 
     public function handle(): array
     {
@@ -28,7 +28,7 @@ class MysqlHandler extends GenericHandler
         try {
             // Build the Data Source Name (DSN) for the MySQL driver
             $dsn = "mysql:host={$host};port={$port};dbname={$dbName};charset=utf8mb4";
-
+            
             // Establish a PDO connection with error handling mode
             $pdo = new PDO($dsn, $user, $pass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -74,7 +74,7 @@ class MysqlHandler extends GenericHandler
 
             // Fetch all results as an associative array
             $data = $stmt->fetchAll();
-
+            
             // Alerting tolerance logic
             $toleranceLockfile = "{$this->lockfileDir}/zero_records_{$identifier}.lock";
 

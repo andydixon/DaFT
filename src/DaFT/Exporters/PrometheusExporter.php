@@ -1,11 +1,11 @@
 <?php
 /**
  * Prometheus Exporter Class
- *
+ * 
  * This class handles the export of data in Prometheus format.
  * It loops through each row of the provided data, treating all but the last key-value pair as labels.
  * Labels are formatted as {key="escaped-value"} pairs.
- *
+ * 
  * @author Andy Dixon
  * @created 2025-01-16
  */
@@ -16,11 +16,11 @@ class PrometheusExporter extends GenericExporter {
 
     /**
      * Outputs data in Prometheus format with labels and metric values.
-     *
+     * 
      * @param array $data Array of rows, where each row is an associative array of column names and values.
      * @param int $statusCode HTTP status code for the response.
      * @param array $additionalConfig Configuration options including 'identifier'.
-     *
+     * 
      * @return void
      */
     public static function export($data, $statusCode, $additionalConfig): void {
@@ -28,11 +28,19 @@ class PrometheusExporter extends GenericExporter {
 
         // Set the identifier or default to 'metric'
         $identifier = isset($additionalConfig['identifier']) ? $additionalConfig['identifier'] : 'metric';
+
         if(isset($additionalConfig['config']['group'])) $identifier= $additionalConfig['config']['group'];
 
-        $backfillMultiplier = $additionalConfig['config']['backfill_multiplier'] ?? 1;
+        $backfillMultiplier = isset($additionalConfig['config']['backfill_multiplier']) ? $additionalConfig['config']['backfill_multiplier'] : 1;
 
         $headerHandler("Content-Type: text/plain");
+        $headerHandler("X-DaFT-Exporter: PrometheusExporter");
+        $headerHandler("X-DaFT-Exporter-Version: 1.0.0");
+        
+        if(!empty($_GET['debug_exporter']) && $_GET['debug_exporter'] == 'true') {
+            var_dump($data);
+        }
+        
 
         foreach ($data as $row) {
             // Get all keys and identify the last key as the metric
@@ -65,23 +73,22 @@ class PrometheusExporter extends GenericExporter {
 
             // Extract labels and metric value
             $labels = array_filter($row, fn($key) => $key !== $lastKey && $key!== "__backfill", ARRAY_FILTER_USE_KEY);
-            if(!empty($row[$lastKey])){
-                $metricValue = $row[$lastKey];
+            $metricValue = (float)$row[$lastKey];
 
-                // Construct labels string
-                $labelsString = self::buildLabelsString($labels);
+            // Construct labels string
+            $labelsString = self::buildLabelsString($labels);
 
-                // Output in Prometheus format
-                echo "{$identifier}{$labelsString} $metricValue$suffix\n";
-            }
+            // Output in Prometheus format
+            echo "{$identifier}{$labelsString} $metricValue$suffix\n";
+            
         }
     }
 
     /**
      * Builds a labels string in Prometheus format from an associative array.
-     *
+     * 
      * @param array $labels Associative array of label keys and values.
-     *
+     * 
      * @return string Labels string in Prometheus format.
      */
     private static function buildLabelsString(array $labels): string {
@@ -102,9 +109,9 @@ class PrometheusExporter extends GenericExporter {
 
     /**
      * Sanitises label keys by removing invalid characters and converting them to snake_case.
-     *
+     * 
      * @param string $key The label key to sanitise.
-     *
+     * 
      * @return string Sanitised label key.
      */
     private static function sanitiseLabelKey($key): string {
@@ -115,9 +122,9 @@ class PrometheusExporter extends GenericExporter {
 
     /**
      * Escapes special characters in label values for Prometheus compatibility.
-     *
+     * 
      * @param string $value The label value to escape.
-     *
+     * 
      * @return string Escaped label value.
      */
     private static function escapeLabelValue($value): string {

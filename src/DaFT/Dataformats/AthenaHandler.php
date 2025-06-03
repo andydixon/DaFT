@@ -5,7 +5,7 @@ use DaFT\Logger;
 use RuntimeException;
 
 /**
- * Class AthenaHandler              ***UNTESTED***
+ * Class AthenaHandler
  * 
  * Executes queries against an AWS Athena database using the ODBC driver.
  * - Reads AWS credentials from config and sets environment variables for ODBC driver.
@@ -14,7 +14,7 @@ use RuntimeException;
  * Security Notice:
  * - Athena ODBC requires environment variables for AWS authentication.
  * - This class automatically sets AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY from config.
- * - Ensure AWS credentials are stored securely. IAM roles are recommended for production use if hosting on AWS.
+ * - Ensure AWS credentials are stored securely.
  * 
  * @namespace DaFT\Dataformats
  */

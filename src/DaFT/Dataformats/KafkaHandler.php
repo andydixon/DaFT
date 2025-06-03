@@ -34,7 +34,7 @@ namespace DaFT\Dataformats;
  * - This class promotes flexible and efficient querying of Kafka topic metadata via the REST Proxy.
  * - It handles network and JSON decoding errors gracefully.
  *
- * @author Your Name
+ * @author Andy Dixon
  * @created 2025-04-08
  * @namespace DaFT\Dataformats
  */
