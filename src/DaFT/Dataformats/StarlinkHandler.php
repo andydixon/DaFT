@@ -10,7 +10,7 @@ namespace DaFT\Dataformats;
  * into a standardized metrics format.
  * 
  * Configuration requirements:
- * - 'dish': The IP address and port of the Starlink dish (default: '192.168.100.1:9200')
+ * - 'source': The IP address and port of the Starlink dish (default: '192.168.100.1:9200')
  * 
  * External dependencies:
  * - 'grpcurl': Command-line tool for interacting with gRPC servers
@@ -36,7 +36,7 @@ class StarlinkHandler extends GenericHandler
      */
     public function handle(): array
     {
-        $dish = $this->config['dish'] ?? '192.168.100.1:9200';
+        $dish = $this->config['source'] ?? '192.168.100.1:9200';
 
         $grpcurl = $this->config['grpcurl']   ?: 'grpcurl';
 
