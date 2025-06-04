@@ -72,13 +72,13 @@ class StarlinkHandler extends GenericHandler
         /* recursive walk */
         $walk = function ($node, string $prefix = '') use (&$walk, &$push, &$labels, $skip) {
             $data = [];
-            foreach($node as $item) {
-                if (is_array($item)) {
-                    $data[] = $item;
-                }
+            if(!is_array($node)) {
+                // If node is not an array, treat it as a single value
+                $push($prefix, $node);
+                return;
             }
 
-            foreach ($data as $k => $v) {
+            foreach ($node as $k => $v) {
                 if (in_array($k, $skip, true)) continue;
                 $key = $prefix . preg_replace('/([a-z])([A-Z])/', '$1_$2', $k); // camelCase→snake
                 $key = strtolower($key);
@@ -98,6 +98,14 @@ class StarlinkHandler extends GenericHandler
             }
         };
         $walk($status);
-        return $metrics;
+
+        
+        // Change into the correct KV structure
+        $returnData = [];
+        foreach ($metrics as $metric) {
+            $returnData[$metric[0]]= $metric[1];
+        }
+
+        return $returnData;
     }
 }

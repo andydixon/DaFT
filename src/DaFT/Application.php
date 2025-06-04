@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DaFT Main Application Class
  * 
@@ -126,18 +127,14 @@ class Application
                 $requestUri = Helpers::cleanUri();
 
                 $uriParts = Helpers::processURIParts($requestUri);
-
-                // Extract the last segment of the URI and convert it to lowercase
-                $format = strtolower(basename($requestUri));
-
-                $exporter = ExporterFactory::create($format['exporter']);
+ 
+                $exporter = ExporterFactory::create($uriParts['exporter']);
 
                 // Set exporter options
                 $exporterOptions = ['identifier' => $identifier];
-                
+
                 // Export from the identified exporter (Defaults to JSON)
                 $exporter::export($result, 200, $exporterOptions);
-
             });
         }
     }
