@@ -71,7 +71,14 @@ class StarlinkHandler extends GenericHandler
 
         /* recursive walk */
         $walk = function ($node, string $prefix = '') use (&$walk, &$push, &$labels, $skip) {
-            foreach ($node as $k => $v) {
+            $data = [];
+            foreach($node as $item) {
+                if (is_array($item)) {
+                    $data[] = $item;
+                }
+            }
+
+            foreach ($data as $k => $v) {
                 if (in_array($k, $skip, true)) continue;
                 $key = $prefix . preg_replace('/([a-z])([A-Z])/', '$1_$2', $k); // camelCase→snake
                 $key = strtolower($key);
