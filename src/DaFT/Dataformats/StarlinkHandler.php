@@ -101,9 +101,9 @@ class StarlinkHandler extends GenericHandler
 
         
         // Change into the correct KV structure
-        $returnData = [];
+        $returnData = [0=>[]];
         foreach ($metrics as $metric) {
-            $returnData[$metric[0]]= $metric[1];
+            $returnData[0][$metric[0]]= $metric[1];
         }
 
         return $returnData;
